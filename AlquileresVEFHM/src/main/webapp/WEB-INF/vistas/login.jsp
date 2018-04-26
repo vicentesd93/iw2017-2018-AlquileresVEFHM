@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
    
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -15,7 +15,7 @@
 				<td><form:input path="usuario"/></td>
 			</tr>
 			<tr>
-				<td><form:label path="clave">Contraseña</form:label></td>
+				<td><form:label path="clave">ContraseÃ±a</form:label></td>
 				<td><form:password path="clave"/></td>
 			</tr>
 			<tr>
