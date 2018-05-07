@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,44 +23,44 @@ public class Usuario {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer _id;
 	@Column
-	@NotNull
+	@NotEmpty(message = "*Introduza su nombre de usuario")
 	private String login;
 	@Column
-	@NotNull
+	@NotEmpty(message = "*Introduza su contraseña")
 	private String clave;
 	@Column
-	@NotNull
+	@NotEmpty(message = "*Introduza un correo eléctronico")
+	@Email(message = "*Introduzca un correo eléctronico válido")
 	private String email;
 	@Column
-	@NotNull
+	@NotEmpty(message = "*Introduza su DNI")
 	private String dni;
 	@Column
-	@NotNull
+	@NotEmpty(message = "*Introduza su nombre")
 	private String nombre;
 	@Column
-	@NotNull
+	@NotEmpty(message = "*Introduza sus apellidos")
 	private String apellidos;
 	@Column
-	@NotNull
 	@Temporal(TemporalType.DATE)
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@NotNull(message = "*Introduza su fecha de nacimiento")
 	private Date f_nacimiento;
 	@Column
-	@NotNull
 	private boolean sexo;
 	@Column
-	@NotNull
+	@NotEmpty(message = "*Introduza su dirección")
 	private String direccion;
 	@Column
-	@NotNull
+	@NotEmpty(message = "*Introduza su teléfono")
 	private String telefono;
 	@Column
-	@NotNull
 	private Integer rol;
 	@Column
-	@NotNull
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date f_creacion;
+	@Column
+	private boolean activo;
 	
 	public Usuario() {}
 	
@@ -101,6 +103,9 @@ public class Usuario {
 	public void setF_creacion(Date f_creacion) {
 		this.f_creacion = f_creacion;
 	}
+	public void setActivo(boolean activo) {
+		this.activo = activo;
+	}
 	
 	public Integer getId() {
 		return _id;
@@ -141,5 +146,7 @@ public class Usuario {
 	public Date getF_creacion() {
 		return f_creacion;
 	}
-	
+	public boolean getActivo() {
+		return activo;
+	}
 }

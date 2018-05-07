@@ -1,4 +1,6 @@
 /home/carmen/git/iw2017-2018-AlquileresVEFHM/AlquileresVEFHM/src/main/java/es/uca/iw/AlquileresVEFHM/modelos/Login.java
 /home/carmen/git/iw2017-2018-AlquileresVEFHM/AlquileresVEFHM/src/main/java/es/uca/iw/AlquileresVEFHM/AlquileresVefhmApplication.java
+/home/carmen/git/iw2017-2018-AlquileresVEFHM/AlquileresVEFHM/src/main/java/es/uca/iw/AlquileresVEFHM/modelos/UsuarioDao.java
+/home/carmen/git/iw2017-2018-AlquileresVEFHM/AlquileresVEFHM/src/main/java/es/uca/iw/AlquileresVEFHM/MvcConfiguration.java
+/home/carmen/git/iw2017-2018-AlquileresVEFHM/AlquileresVEFHM/src/main/java/es/uca/iw/AlquileresVEFHM/modelos/Usuario.java
 /home/carmen/git/iw2017-2018-AlquileresVEFHM/AlquileresVEFHM/src/main/java/es/uca/iw/AlquileresVEFHM/controladores/gestion_usuarioControlador.java
-/home/carmen/git/iw2017-2018-AlquileresVEFHM/AlquileresVEFHM/src/main/java/es/uca/iw/AlquileresVEFHM/controladores/MvcConfiguration.java
