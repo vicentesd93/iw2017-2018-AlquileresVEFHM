@@ -7,7 +7,7 @@ import org.springframework.data.repository.CrudRepository;
 import es.uca.iw.AlquileresVEFHM.modelos.Usuario;
 
 @Transactional
-public interface UsuarioDao extends CrudRepository<Usuario, Integer> {
+public interface UsuarioDAO extends CrudRepository<Usuario, Integer> {
 	Usuario findByLogin(String login);
 	Usuario findByEmail(String email);
 }

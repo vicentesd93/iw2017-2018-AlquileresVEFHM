@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import es.uca.iw.AlquileresVEFHM.DAO.RolDAO;
-import es.uca.iw.AlquileresVEFHM.DAO.UsuarioDao;
+import es.uca.iw.AlquileresVEFHM.DAO.UsuarioDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.Rol;
 import es.uca.iw.AlquileresVEFHM.modelos.Usuario;
 
 @Controller
 public class loginControlador {
 	@Autowired
-	private UsuarioDao userDao;
+	private UsuarioDAO userDao;
 	@Autowired
 	private RolDAO rolDao;
 	
@@ -27,11 +27,6 @@ public class loginControlador {
 		ModelAndView modelAndView = new ModelAndView();
 		modelAndView.setViewName("login");
 		return modelAndView;
-	}
-	
-	@RequestMapping(value="/acceso-denegado")
-	public ModelAndView AccesoDenegado() {
-		return new ModelAndView("acceso-denegado");
 	}
 	
 	@RequestMapping(value="/usuario", method=RequestMethod.GET)

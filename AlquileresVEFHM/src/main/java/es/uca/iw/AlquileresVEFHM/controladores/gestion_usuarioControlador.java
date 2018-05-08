@@ -1,7 +1,6 @@
 package es.uca.iw.AlquileresVEFHM.controladores;
 
 import java.util.Date;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -9,26 +8,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import es.uca.iw.AlquileresVEFHM.modelos.Login;
 import es.uca.iw.AlquileresVEFHM.modelos.Usuario;
-import es.uca.iw.AlquileresVEFHM.DAO.UsuarioDao;
+import es.uca.iw.AlquileresVEFHM.DAO.UsuarioDAO;
 
 @Controller
 public class gestion_usuarioControlador {
 	@Autowired
-	private UsuarioDao userDao;
-	
-	@RequestMapping("/")
-    public String index() {
-        return "index";
-    }
+	private UsuarioDAO userDao;
 	
 	/*@RequestMapping(value="/modificar/{id}", method=RequestMethod.GET)
 	public ModelAndView modificar_usuario_GET(@PathVariable(value="id") Integer id) {

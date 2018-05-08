@@ -1,0 +1,20 @@
+** Listo **
+- Registro usuario
+- Validación registro usuario
+- Login
+- Logout
+- Control de acceso
+
+** Modelos **
+- Usuario
+- Rol
+- Apartamento*
+- Tipo apartamento*
+- Foto_apartamento*
+
+** BD (BD.sql) **
+- usuario
+- rol
+- apartamento
+- tipo_apartamento
+- foto apartamento
