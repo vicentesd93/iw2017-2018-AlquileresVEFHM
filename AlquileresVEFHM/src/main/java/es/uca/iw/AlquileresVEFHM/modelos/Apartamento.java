@@ -17,16 +17,16 @@ public class Apartamento {
 	@Column
 	private Integer anfitrion;
 	@Column
-	@NotEmpty(message = "Introduzca la descripción del inmueble")
+	@NotEmpty(message = "*Introduzca la descripción del inmueble")
 	private String descripcion;
 	@Column
-	@NotEmpty(message = "Introduzca la dirección del inmueble")
+	@NotEmpty(message = "*Introduzca la dirección del inmueble")
 	private String direccion;
 	@Column
-	@NotEmpty(message = "Introduzca la población del inmueble")
+	@NotEmpty(message = "*Introduzca la población del inmueble")
 	private String poblacion;
 	@Column
-	@NotEmpty(message = "Introduzca el pais del inmueble")
+	@NotEmpty(message = "*Introduzca el pais del inmueble")
 	private String pais;
 	@Column
 	private Integer tipo_apartamento;
@@ -37,7 +37,7 @@ public class Apartamento {
 	@Column
 	private Integer m2;
 	@Column
-	private boolean garage;
+	private boolean garaje;
 	@Column
 	private boolean mascotas;
 	@Column
@@ -50,8 +50,6 @@ public class Apartamento {
 	private boolean trastero;
 	@Column
 	private boolean ascensor;
-	@Column
-	private String clase_energetica;
 	
 	public Integer getId() {
 		return _id;
@@ -113,11 +111,11 @@ public class Apartamento {
 	public void setM2(Integer m2) {
 		this.m2 = m2;
 	}
-	public boolean getGarage() {
-		return garage;
+	public boolean getgaraje() {
+		return garaje;
 	}
-	public void setGarage(boolean garage) {
-		this.garage = garage;
+	public void setgaraje(boolean garaje) {
+		this.garaje = garaje;
 	}
 	public boolean getMascotas() {
 		return mascotas;
@@ -154,11 +152,5 @@ public class Apartamento {
 	}
 	public void setAscensor(boolean ascensor) {
 		this.ascensor = ascensor;
-	}
-	public String getClase_energetica() {
-		return clase_energetica;
-	}
-	public void setClase_energetica(String clase_energetica) {
-		this.clase_energetica = clase_energetica;
 	}
 }

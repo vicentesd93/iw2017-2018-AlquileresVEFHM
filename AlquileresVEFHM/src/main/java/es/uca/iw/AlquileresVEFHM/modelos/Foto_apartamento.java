@@ -1,10 +1,13 @@
 package es.uca.iw.AlquileresVEFHM.modelos;
 
+import java.sql.Blob;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 
@@ -19,6 +22,9 @@ public class Foto_apartamento {
 	@Column
 	@NotEmpty(message = "Introduzca el nombre del archivo")
 	private String nombre;
+	@Column
+	@Lob
+	private Blob foto;
 	
 	public Integer getId() {
 		return _id;
@@ -37,5 +43,11 @@ public class Foto_apartamento {
 	}
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
+	}
+	public Blob getFoto() {
+		return foto;
+	}
+	public void setFoto(Blob foto) {
+		this.foto = foto;
 	}	
 }

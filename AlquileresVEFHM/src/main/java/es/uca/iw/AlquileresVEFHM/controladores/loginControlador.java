@@ -22,14 +22,12 @@ public class loginControlador {
 	@Autowired
 	private RolDAO rolDao;
 	
-	@RequestMapping(value="/login", method=RequestMethod.GET)
+	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public ModelAndView login() {
-		ModelAndView modelAndView = new ModelAndView();
-		modelAndView.setViewName("login");
-		return modelAndView;
+		return new ModelAndView("login");
 	}
 	
-	@RequestMapping(value="/usuario", method=RequestMethod.GET)
+	@RequestMapping(value = "/usuario", method = RequestMethod.GET)
 	@ResponseBody
 	public String usuario(Principal principal) {
 		Usuario u = userDao.findByLogin(principal.getName());

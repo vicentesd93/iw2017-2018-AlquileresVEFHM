@@ -1,16 +1,19 @@
-** Listo **
+** Listo ** (necesita pruebas)
 - Registro usuario
 - Validación registro usuario
 - Login
 - Logout
 - Control de acceso
+- Registro apartamento
+- Visualizar foto
+
 
 ** Modelos **
 - Usuario
 - Rol
-- Apartamento*
-- Tipo apartamento*
-- Foto_apartamento*
+- Apartamento
+- Tipo apartamento
+- Foto_apartamento
 
 ** BD (BD.sql) **
 - usuario

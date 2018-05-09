@@ -11,10 +11,8 @@ public class generalControlador {
         return "index";
     }
 	
-	@RequestMapping(value="/acceso-denegado")
+	@RequestMapping(value = "/acceso-denegado")
 	public ModelAndView AccesoDenegado() {
 		return new ModelAndView("acceso-denegado");
 	}
-
-	
 }

@@ -19,38 +19,17 @@ import es.uca.iw.AlquileresVEFHM.DAO.UsuarioDAO;
 public class gestion_usuarioControlador {
 	@Autowired
 	private UsuarioDAO userDao;
+	@Autowired
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
-	/*@RequestMapping(value="/modificar/{id}", method=RequestMethod.GET)
-	public ModelAndView modificar_usuario_GET(@PathVariable(value="id") Integer id) {
-		return new ModelAndView("modificar_usuario", "usuario", userDao.findById(id).get());
-	}
-	
-	@RequestMapping(value="/modificar", method=RequestMethod.POST)
-	@ResponseBody
-	public String modificar_usuario_POST(@ModelAttribute("Usuario")Usuario usuario) {
-		try {
-			Optional<Usuario> usu = userDao.findById(usuario.getId());
-			usuario.setLogin(usu.get().getLogin());
-			usuario.setClave(usu.get().getClave());
-			usuario.setF_creacion(usu.get().getF_creacion());
-			userDao.save(usuario);
-		}catch(Exception e) {
-			return e.toString();
-		}
-		return "OK";
-	}*/
-	
-	@RequestMapping(value="/registro", method=RequestMethod.GET)
+	@RequestMapping(value = "/registro", method = RequestMethod.GET)
 	public ModelAndView alta_usuario_GET() {
 		return new ModelAndView("alta_usuario", "usuario", new Usuario());
 	}
 	
-	@Autowired
-	private BCryptPasswordEncoder bCryptPasswordEncoder;
-	
-	@RequestMapping(value="/registro", method=RequestMethod.POST)
+	@RequestMapping(value = "/registro", method = RequestMethod.POST)
 	public ModelAndView alta_usuario_POST(@Valid Usuario usuario, BindingResult br) {
-		ModelAndView modelAndView = new ModelAndView();
+		ModelAndView mav = new ModelAndView();
 		if(userDao.findByLogin(usuario.getLogin()) != null) {
 			br.rejectValue("login", "error.login", "El nombre de usuario ya esta en uso.");
 		}
@@ -58,17 +37,16 @@ public class gestion_usuarioControlador {
 			br.rejectValue("email", "error.email", "El correo eléctronico ya esta asociado a una cuenta.");
 		}
 		if (br.hasErrors()) {
-			modelAndView.setViewName("alta_usuario");
+			mav.setViewName("alta_usuario");
 		} else {
 			usuario.setF_creacion(new Date());
 			usuario.setActivo(true); 
 			usuario.setClave(bCryptPasswordEncoder.encode(usuario.getClave()));
 			userDao.save(usuario);
-			modelAndView.addObject("exito", "Usuario registrado correctamente");
-			modelAndView.addObject("usuario", new Usuario());
-			modelAndView.setViewName("alta_usuario");
-			
+			mav.addObject("exito", "Usuario registrado correctamente");
+			mav.addObject("usuario", new Usuario());
+			mav.setViewName("alta_usuario");		
 		}
-		return modelAndView;
+		return mav;
 	}
 }

@@ -10,43 +10,43 @@
 		<p>Si ya esta registrado, inicie sesión <a th:href="@{/login}">aquí</a></p>
 		<input type="text" th:field="*{login}" placeholder="Nombre de usuario"/>
 		<br>
-		<label th:if="${#fields.hasErrors('login')}" th:errors="*{login}"></label>
+		<label style="color:red" th:if="${#fields.hasErrors('login')}" th:errors="*{login}"></label>
 		<br>
 		<input type="password" th:field="*{clave}" placeholder="Contraseña"/>
 		<br>
-		<label th:if="${#fields.hasErrors('clave')}" th:errors="*{clave}"></label>
+		<label style="color:red" th:if="${#fields.hasErrors('clave')}" th:errors="*{clave}"></label>
 		<br>
 		<input type="text" th:field="*{email}" placeholder="Correo electrónico"/>
 		<br>
-		<label th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></label>
+		<label style="color:red" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></label>
 		<br>
 		<input type="text" th:field="*{dni}" placeholder="DNI"/>
 		<br>
-		<label th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}"></label>
+		<label style="color:red" th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}"></label>
 		<br>
 		<input type="text" th:field="*{nombre}" placeholder="Nombre"/>
 		<br>
-		<label th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></label>
+		<label style="color:red" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></label>
 		<br>
 		<input type="text" th:field="*{apellidos}" placeholder="Apellidos"/>
 		<br>
-		<label th:if="${#fields.hasErrors('apellidos')}" th:errors="*{apellidos}"></label>
+		<label style="color:red" th:if="${#fields.hasErrors('apellidos')}" th:errors="*{apellidos}"></label>
 		<br>
 		<label>Fecha nacimiento: </label><input type="date" th:field="*{f_nacimiento}"/>
 		<br>
-		<label th:if="${#fields.hasErrors('f_nacimiento')}" th:errors="*{f_nacimiento}"></label>
+		<label style="color:red" th:if="${#fields.hasErrors('f_nacimiento')}" th:errors="*{f_nacimiento}"></label>
 		<br>
 		<input type="radio" th:field="*{sexo}" th:value="${0}"/>Mujer<input type="radio" th:field="*{sexo}" th:value="${1}"/>Hombre
 		<br>
-		<label th:if="${#fields.hasErrors('sexo')}" th:errors="*{sexo}"></label>
+		<label style="color:red" th:if="${#fields.hasErrors('sexo')}" th:errors="*{sexo}"></label>
 		<br>
 		<input type="text" th:field="*{direccion}" placeholder="Dirección"/>
 		<br>
-		<label th:if="${#fields.hasErrors('direccion')}" th:errors="*{direccion}"></label>
+		<label style="color:red" th:if="${#fields.hasErrors('direccion')}" th:errors="*{direccion}"></label>
 		<br>
 		<input type="text" th:field="*{telefono}" placeholder="Teléfono"/>
 		<br>
-		<label th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}"></label>
+		<label style="color:red" th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}"></label>
 		<br>
 		<label>Rol: </label><select th:field="*{rol}">
 			<option th:value="1" th:text="Huésped"></option>
