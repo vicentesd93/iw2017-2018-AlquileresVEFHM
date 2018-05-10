@@ -48,9 +48,9 @@
 		<br>
 		<label style="color:red" th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}"></label>
 		<br>
-		<label>Rol: </label><select th:field="*{rol}">
-			<option th:value="1" th:text="Huésped"></option>
-			<option th:value="2" th:text="Anfitrión"></option>
+		<label>Rol: </label>
+		<select th:field="*{rol}">
+			<option th:each="rol:${roles}" th:value="${rol.id}" th:text="${rol.nombre}">
 		</select>
 		<br>
 		<label th:if="${#fields.hasErrors('rol')}" th:errors="*{rol}"></label>

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import es.uca.iw.AlquileresVEFHM.modelos.Usuario;
+import es.uca.iw.AlquileresVEFHM.DAO.RolDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.UsuarioDAO;
 
 @Controller
@@ -20,11 +21,16 @@ public class gestion_usuarioControlador {
 	@Autowired
 	private UsuarioDAO userDao;
 	@Autowired
+	private RolDAO rolDao;
+	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
 	@RequestMapping(value = "/registro", method = RequestMethod.GET)
 	public ModelAndView alta_usuario_GET() {
-		return new ModelAndView("alta_usuario", "usuario", new Usuario());
+		ModelAndView mav = new ModelAndView("alta_usuario");
+		mav.addObject("usuario", new Usuario());
+		mav.addObject("roles", rolDao.findAll());
+		return mav;
 	}
 	
 	@RequestMapping(value = "/registro", method = RequestMethod.POST)
@@ -36,10 +42,11 @@ public class gestion_usuarioControlador {
 		if(userDao.findByEmail(usuario.getEmail()) != null) {
 			br.rejectValue("email", "error.email", "El correo eléctronico ya esta asociado a una cuenta.");
 		}
+		usuario.setF_creacion(new Date());
 		if (br.hasErrors()) {
+			System.out.println(br.toString());
 			mav.setViewName("alta_usuario");
 		} else {
-			usuario.setF_creacion(new Date());
 			usuario.setActivo(true); 
 			usuario.setClave(bCryptPasswordEncoder.encode(usuario.getClave()));
 			userDao.save(usuario);

@@ -1,35 +1,51 @@
 package es.uca.iw.AlquileresVEFHM.modelos;
 
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name="apartamento")
+@Table(name = "apartamento")
 public class Apartamento {
 	@Id
+	@Column(name = "_id")
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Integer _id;
-	@Column
-	private Integer anfitrion;
+	private Integer id;
+	@JoinColumn(name = "anfitrion", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Usuario usuario;
 	@Column
 	@NotEmpty(message = "*Introduzca la descripción del inmueble")
+	@NotNull
 	private String descripcion;
 	@Column
 	@NotEmpty(message = "*Introduzca la dirección del inmueble")
+	@NotNull
 	private String direccion;
 	@Column
 	@NotEmpty(message = "*Introduzca la población del inmueble")
+	@NotNull
 	private String poblacion;
 	@Column
 	@NotEmpty(message = "*Introduzca el pais del inmueble")
+	@NotNull
 	private String pais;
-	@Column
-	private Integer tipo_apartamento;
+	@JoinColumn(name = "tipo_apartamento")
+	@ManyToOne(fetch = FetchType.EAGER)
+	@NotNull
+	private Tipo_apartamento tipo_apartamento;
 	@Column
 	private Integer aseos;
 	@Column
@@ -50,18 +66,55 @@ public class Apartamento {
 	private boolean trastero;
 	@Column
 	private boolean ascensor;
+	@OneToMany(mappedBy = "apartamento", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private Set<Foto_apartamento> fotos_apartamento;
 	
+	public Apartamento() {}
+	
+	public Apartamento(Usuario usuario, String descripcion, String direccion, String poblacion, String pais, Tipo_apartamento tipo_apartamento) {
+		super();
+		this.usuario = usuario;
+		this.descripcion = descripcion;
+		this.direccion = direccion;
+		this.poblacion = poblacion;
+		this.pais = pais;
+		this.tipo_apartamento = tipo_apartamento;
+	}
+	
+	public Apartamento(Usuario usuario, String descripcion, String direccion, String poblacion, String pais, Tipo_apartamento tipo_apartamento,
+			Integer aseos, Integer dormitorios, Integer m2, boolean garaje, boolean mascotas, boolean amueblado,
+			boolean piscina, boolean jardin, boolean trastero, boolean ascensor, Set<Foto_apartamento> fotos_apartamento) {
+		super();
+		this.usuario = usuario;
+		this.descripcion = descripcion;
+		this.direccion = direccion;
+		this.poblacion = poblacion;
+		this.pais = pais;
+		this.tipo_apartamento = tipo_apartamento;
+		this.aseos = aseos;
+		this.dormitorios = dormitorios;
+		this.m2 = m2;
+		this.garaje = garaje;
+		this.mascotas = mascotas;
+		this.amueblado = amueblado;
+		this.piscina = piscina;
+		this.jardin = jardin;
+		this.trastero = trastero;
+		this.ascensor = ascensor;
+		this.fotos_apartamento = fotos_apartamento;
+	}
+
 	public Integer getId() {
-		return _id;
+		return id;
 	}
-	public void setId(Integer _id) {
-		this._id = _id;
+	public void setId(Integer id) {
+		this.id = id;
 	}
-	public Integer getAnfitrion() {
-		return anfitrion;
+	public Usuario getUsuario() {
+		return usuario;
 	}
-	public void setAnfitrion(Integer anfitrion) {
-		this.anfitrion = anfitrion;
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 	public String getDescripcion() {
 		return descripcion;
@@ -87,10 +140,10 @@ public class Apartamento {
 	public void setPais(String pais) {
 		this.pais = pais;
 	}
-	public Integer getTipo_apartamento() {
+	public Tipo_apartamento getTipo_apartamento() {
 		return tipo_apartamento;
 	}
-	public void setTipo_apartamento(Integer tipo_apartamento) {
+	public void setTipo_apartamento(Tipo_apartamento tipo_apartamento) {
 		this.tipo_apartamento = tipo_apartamento;
 	}
 	public Integer getAseos() {
@@ -111,46 +164,52 @@ public class Apartamento {
 	public void setM2(Integer m2) {
 		this.m2 = m2;
 	}
-	public boolean getgaraje() {
+	public boolean isGaraje() {
 		return garaje;
 	}
-	public void setgaraje(boolean garaje) {
+	public void setGaraje(boolean garaje) {
 		this.garaje = garaje;
 	}
-	public boolean getMascotas() {
+	public boolean isMascotas() {
 		return mascotas;
 	}
 	public void setMascotas(boolean mascotas) {
 		this.mascotas = mascotas;
 	}
-	public boolean getAmueblado() {
+	public boolean isAmueblado() {
 		return amueblado;
 	}
 	public void setAmueblado(boolean amueblado) {
 		this.amueblado = amueblado;
 	}
-	public boolean getPiscina() {
+	public boolean isPiscina() {
 		return piscina;
 	}
 	public void setPiscina(boolean piscina) {
 		this.piscina = piscina;
 	}
-	public boolean getJardin() {
+	public boolean isJardin() {
 		return jardin;
 	}
 	public void setJardin(boolean jardin) {
 		this.jardin = jardin;
 	}
-	public boolean getTrastero() {
+	public boolean isTrastero() {
 		return trastero;
 	}
 	public void setTrastero(boolean trastero) {
 		this.trastero = trastero;
 	}
-	public boolean getAscensor() {
+	public boolean isAscensor() {
 		return ascensor;
 	}
 	public void setAscensor(boolean ascensor) {
 		this.ascensor = ascensor;
+	}
+	public Set<Foto_apartamento> getFotos_apartamento() {
+		return fotos_apartamento;
+	}
+	public void setFotos_apartamento(Set<Foto_apartamento> fotos_apartamento) {
+		this.fotos_apartamento = fotos_apartamento;
 	}
 }

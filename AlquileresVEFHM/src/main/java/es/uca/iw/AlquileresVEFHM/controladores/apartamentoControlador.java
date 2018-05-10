@@ -1,8 +1,8 @@
 package es.uca.iw.AlquileresVEFHM.controladores;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.rowset.serial.SerialBlob;
@@ -27,7 +27,6 @@ import es.uca.iw.AlquileresVEFHM.DAO.Tipo_apartamentoDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.UsuarioDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.Apartamento;
 import es.uca.iw.AlquileresVEFHM.modelos.Foto_apartamento;
-import es.uca.iw.AlquileresVEFHM.modelos.Tipo_apartamento;
 import es.uca.iw.AlquileresVEFHM.modelos.Usuario;
 
 @Controller
@@ -45,7 +44,7 @@ public class apartamentoControlador {
 	public ModelAndView registro_GET() {
 		ModelAndView mav = new ModelAndView("alta_apartamento");
 		mav.addObject("apartamento", new Apartamento());
-		mav.addObject("tipos", (ArrayList<Tipo_apartamento>)t_aparDao.findAll());
+		mav.addObject("tipos", t_aparDao.findAll());
 		return mav;
 	}
 	
@@ -53,30 +52,27 @@ public class apartamentoControlador {
 	public ModelAndView registro_POST(Principal principal, @RequestParam("fotos") List<MultipartFile> fotos, @Valid Apartamento apartamento, BindingResult br) {
 		ModelAndView mav = new ModelAndView();
 		if(br.hasErrors()) {
-			mav.addObject("tipos", (ArrayList<Tipo_apartamento>)t_aparDao.findAll());
+			System.out.println(br.toString());
+			mav.addObject("tipos", t_aparDao.findAll());
 			mav.setViewName("alta_apartamento");
 		}else {
 			Apartamento apar = null;
 			try {
 				Usuario usu = userDao.findByLogin(principal.getName());
-				apartamento.setAnfitrion(usu.getId());
+				apartamento.setUsuario(usu);
 				apar = aparDao.save(apartamento);
 				for (MultipartFile foto : fotos) {
 					String nombre = usu.getId()+"_"+apar.getId()+"_"+System.currentTimeMillis()+"."+foto.getOriginalFilename().split("\\.")[1];
-					Foto_apartamento fa = new Foto_apartamento();
-					fa.setApartamento(apar.getId());
-					fa.setNombre(nombre);
-					fa.setFoto(new SerialBlob(foto.getBytes()));
-					f_aparDao.save(fa);
+					f_aparDao.save(new Foto_apartamento(apar,nombre,new SerialBlob(foto.getBytes())));
 				}
 			} catch(Exception e) {
 				if(apar != null) {
-					for(Foto_apartamento foto : f_aparDao.findByApartamento(apar.getId())) f_aparDao.delete(foto);
+					for(Foto_apartamento foto : apar.getFotos_apartamento()) f_aparDao.delete(foto);
 					aparDao.delete(apar);
 				}
 			}
 			mav.addObject("apartamento", new Apartamento());
-			mav.addObject("tipos", (ArrayList<Tipo_apartamento>)t_aparDao.findAll());
+			mav.addObject("tipos", t_aparDao.findAll());
 			mav.addObject("exito", "Apartamento registrado correctamente");
 			mav.setViewName("alta_apartamento");
 		}
@@ -100,10 +96,9 @@ public class apartamentoControlador {
 	public ModelAndView ver_GET(Principal principal) {
 		ModelAndView mav = new ModelAndView("apartamento");
 		Usuario usu = userDao.findByLogin(principal.getName());
-		List<Apartamento> aparts = aparDao.findByAnfitrion(usu.getId());
-		List<Foto_apartamento> fotos = f_aparDao.findByApartamento(aparts.get(0).getId());
-		mav.addObject("apartamento", aparts.get(0));
-		mav.addObject("fotos", fotos);
+		Set<Apartamento> aparts = usu.getApartamentos();
+		mav.addObject("apartamento", aparts.iterator().next());
+		mav.addObject("fotos", aparts.iterator().next().getFotos_apartamento());
 		return mav;
 	}
 }
