@@ -15,6 +15,7 @@
 - Tipo apartamento
 - Foto_apartamento
 
+
 ** BD (BD.sql) **
 - usuario
 - rol
@@ -22,8 +23,7 @@
 - tipo_apartamento
 - foto apartamento
 
-El archivo BD.sql es innecesario, las tablas se crean automáticamente y se introducen los datos de las tablas
-tipo_apartamento y rol, solo es necesario crear la base de datos tal que así:
+El archivo BD.sql es innecesario, las tablas se crean automáticamente y se introducen los datos de las tablas tipo_apartamento y rol, solo es necesario crear la base de datos tal que así:
 
 CREATE SCHEMA IF NOT EXISTS `db_inmobiliaria` DEFAULT CHARACTER SET utf8 COLLATE utf8_spanish_ci ;
 
