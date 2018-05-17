@@ -24,10 +24,10 @@ import org.springframework.web.servlet.ModelAndView;
 import es.uca.iw.AlquileresVEFHM.DAO.ApartamentoDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.Foto_apartamentoDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.Tipo_apartamentoDAO;
-import es.uca.iw.AlquileresVEFHM.DAO.UsuarioDAO;
+import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.Apartamento;
 import es.uca.iw.AlquileresVEFHM.modelos.Foto_apartamento;
-import es.uca.iw.AlquileresVEFHM.modelos.Usuario;
+import es.uca.iw.AlquileresVEFHM.modelos.User;
 
 @Controller
 public class apartamentoControlador {
@@ -38,7 +38,7 @@ public class apartamentoControlador {
 	@Autowired
 	private Foto_apartamentoDAO f_aparDao;
 	@Autowired
-	private UsuarioDAO userDao;
+	private UserDAO userDao;
 	
 	@RequestMapping(value = "/apartamento/registro", method = RequestMethod.GET)
 	public ModelAndView registro_GET() {
@@ -58,8 +58,8 @@ public class apartamentoControlador {
 		}else {
 			Apartamento apar = null;
 			try {
-				Usuario usu = userDao.findByLogin(principal.getName());
-				apartamento.setUsuario(usu);
+				User usu = userDao.findByLogin(principal.getName());
+				apartamento.setAnfitrion(usu);
 				apar = aparDao.save(apartamento);
 				for (MultipartFile foto : fotos) {
 					String nombre = usu.getId()+"_"+apar.getId()+"_"+System.currentTimeMillis()+"."+foto.getOriginalFilename().split("\\.")[1];
@@ -95,7 +95,7 @@ public class apartamentoControlador {
 	@RequestMapping(value = "/apartamento/ver", method = RequestMethod.GET)
 	public ModelAndView ver_GET(Principal principal) {
 		ModelAndView mav = new ModelAndView("apartamento");
-		Usuario usu = userDao.findByLogin(principal.getName());
+		User usu = userDao.findByLogin(principal.getName());
 		Set<Apartamento> aparts = usu.getApartamentos();
 		mav.addObject("apartamento", aparts.iterator().next());
 		mav.addObject("fotos", aparts.iterator().next().getFotos_apartamento());

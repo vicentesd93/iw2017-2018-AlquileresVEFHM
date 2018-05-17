@@ -1,5 +1,5 @@
 package es.uca.iw.AlquileresVEFHM;
-
+/*
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,13 +36,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		
-		http.authorizeRequests()
+		http.csrf().disable()
+			.authorizeRequests()
 				.antMatchers("/", "/login", "/registro", "/fotos/**").permitAll()
 				//.antMatchers("/usuario").hasAuthority("Huesped")
 				.antMatchers("/apartamento/registro", "/apartamento/ver").hasAuthority("Anfitrion")
 				.antMatchers("/usuario").hasAnyAuthority("Huesped","Anfitrion")
 				.anyRequest().authenticated()
-				.and().csrf().disable().formLogin()
+				.and().formLogin()
 				.loginPage("/login").failureUrl("/login?error=true")
 				.defaultSuccessUrl("/")
 				.usernameParameter("login")
@@ -55,6 +56,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	
 	@Override
 	public void configure(WebSecurity web) throws Exception {
-	    web.ignoring().antMatchers();
+	    web.ignoring().antMatchers("/VAADIN/**","/UIDL/**","/HEARTBEAT/**");
 	}
-}
+}*/
