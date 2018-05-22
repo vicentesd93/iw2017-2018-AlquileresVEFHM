@@ -7,6 +7,6 @@ import org.springframework.data.repository.CrudRepository;
 import es.uca.iw.AlquileresVEFHM.modelos.Foto_apartamento;
 
 @Transactional
-public interface Foto_apartamentoDAO extends CrudRepository<Foto_apartamento, Integer>{
+public interface Foto_apartamentoDAO extends CrudRepository<Foto_apartamento, Integer> {
 	public Foto_apartamento findByNombre(String nombre);
 }

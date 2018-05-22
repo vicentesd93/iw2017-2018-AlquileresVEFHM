@@ -4,8 +4,9 @@ import javax.transaction.Transactional;
 
 import org.springframework.data.repository.CrudRepository;
 
-import es.uca.iw.AlquileresVEFHM.modelos.Apartamento;
+import es.uca.iw.AlquileresVEFHM.modelos.Reserva;
 
 @Transactional
-public interface ApartamentoDAO extends CrudRepository<Apartamento, Integer> {
+public interface ReservaDAO extends CrudRepository<Reserva, Integer> {
+
 }

@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import es.uca.iw.AlquileresVEFHM.modelos.Usuario;
+import es.uca.iw.AlquileresVEFHM.modelos.User;
 import es.uca.iw.AlquileresVEFHM.DAO.RolDAO;
-import es.uca.iw.AlquileresVEFHM.DAO.UsuarioDAO;
+import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
 
 @Controller
 public class gestion_usuarioControlador {
 	@Autowired
-	private UsuarioDAO userDao;
+	private UserDAO userDao;
 	@Autowired
 	private RolDAO rolDao;
 	@Autowired
@@ -28,13 +28,13 @@ public class gestion_usuarioControlador {
 	@RequestMapping(value = "/registro", method = RequestMethod.GET)
 	public ModelAndView alta_usuario_GET() {
 		ModelAndView mav = new ModelAndView("alta_usuario");
-		mav.addObject("usuario", new Usuario());
+		mav.addObject("usuario", new User());
 		mav.addObject("roles", rolDao.findAll());
 		return mav;
 	}
 	
 	@RequestMapping(value = "/registro", method = RequestMethod.POST)
-	public ModelAndView alta_usuario_POST(@Valid Usuario usuario, BindingResult br) {
+	public ModelAndView alta_usuario_POST(@Valid User usuario, BindingResult br) {
 		ModelAndView mav = new ModelAndView();
 		if(userDao.findByLogin(usuario.getLogin()) != null) {
 			br.rejectValue("login", "error.login", "El nombre de usuario ya esta en uso.");
@@ -51,7 +51,7 @@ public class gestion_usuarioControlador {
 			usuario.setClave(bCryptPasswordEncoder.encode(usuario.getClave()));
 			userDao.save(usuario);
 			mav.addObject("exito", "Usuario registrado correctamente");
-			mav.addObject("usuario", new Usuario());
+			mav.addObject("usuario", new User());
 			mav.setViewName("alta_usuario");		
 		}
 		return mav;
