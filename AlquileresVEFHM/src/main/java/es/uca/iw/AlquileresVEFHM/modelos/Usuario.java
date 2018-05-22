@@ -1,6 +1,5 @@
 package es.uca.iw.AlquileresVEFHM.modelos;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
@@ -22,12 +21,10 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(name="usuario")
-public class User implements UserDetails{
+public class Usuario {
 	@Id
 	@Column(name = "_id")
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -81,13 +78,11 @@ public class User implements UserDetails{
 	private Date f_creacion;
 	@Column
 	private boolean activo;
-	@OneToMany(mappedBy = "anfitrion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<Apartamento> apartamentos;
-	@OneToMany(mappedBy = "huesped", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<Reserva> reservas;
 	
-	public User() {}
-	public User(@NotEmpty(message = "*Introduza su nombre de usuario") @NotNull String login,
+	public Usuario() {}
+	public Usuario(@NotEmpty(message = "*Introduza su nombre de usuario") @NotNull String login,
 			@NotEmpty(message = "*Introduza su contraseña") @NotNull String clave,
 			@NotEmpty(message = "*Introduza un correo eléctronico") @Email(message = "*Introduzca un correo eléctronico válido") @NotNull String email,
 			@NotEmpty(message = "*Introduza su DNI") @NotNull String dni,
@@ -96,7 +91,7 @@ public class User implements UserDetails{
 			@NotNull(message = "*Introduza su fecha de nacimiento") Date f_nacimiento, boolean sexo,
 			@NotEmpty(message = "*Introduza su dirección") @NotNull String direccion,
 			@NotEmpty(message = "*Introduza su teléfono") @NotNull String telefono, @NotNull Rol rol,
-			@NotNull Date f_creacion, boolean activo) {
+			@NotNull Date f_creacion, boolean activo, Set<Apartamento> apartamentos) {
 		super();
 		this.login = login;
 		this.clave = clave;
@@ -111,6 +106,7 @@ public class User implements UserDetails{
 		this.rol = rol;
 		this.f_creacion = f_creacion;
 		this.activo = activo;
+		this.apartamentos = apartamentos;
 	}
 	
 	public Integer getId() {
@@ -158,9 +154,6 @@ public class User implements UserDetails{
 	public Set<Apartamento> getApartamentos() {
 		return apartamentos;
 	}
-	public Set<Reserva> getReservas() {
-		return reservas;
-	}
 	
 	public void setId(Integer id) {
 		this.id = id;
@@ -206,44 +199,5 @@ public class User implements UserDetails{
 	}
 	public void setApartamentos(Set<Apartamento> apartamentos) {
 		this.apartamentos = apartamentos;
-	}
-	public void setReservas(Set<Reserva> reservas) {
-		this.reservas = reservas;
-	}
-	
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public String getPassword() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public String getUsername() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public boolean isAccountNonExpired() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	@Override
-	public boolean isAccountNonLocked() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	@Override
-	public boolean isCredentialsNonExpired() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	@Override
-	public boolean isEnabled() {
-		// TODO Auto-generated method stub
-		return false;
 	}
 }

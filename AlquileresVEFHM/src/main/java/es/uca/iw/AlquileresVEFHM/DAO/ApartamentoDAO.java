@@ -7,5 +7,5 @@ import org.springframework.data.repository.CrudRepository;
 import es.uca.iw.AlquileresVEFHM.modelos.Apartamento;
 
 @Transactional
-public interface ApartamentoDAO extends CrudRepository<Apartamento, Integer> {
+public interface ApartamentoDAO extends CrudRepository<Apartamento, Integer>{
 }

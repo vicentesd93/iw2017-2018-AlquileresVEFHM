@@ -6,10 +6,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class generalControlador {
-	/*@RequestMapping("/")
+	@RequestMapping("/")
     public String index() {
         return "index";
-    }*/
+    }
 	
 	@RequestMapping(value = "/acceso-denegado")
 	public ModelAndView AccesoDenegado() {

@@ -9,15 +9,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
-import es.uca.iw.AlquileresVEFHM.modelos.User;
+import es.uca.iw.AlquileresVEFHM.DAO.UsuarioDAO;
+import es.uca.iw.AlquileresVEFHM.modelos.Usuario;
 
 @Controller
 public class loginControlador {
 	@Autowired
-	private UserDAO userDao;
+	private UsuarioDAO userDao;
 	
-	//@RequestMapping(value = "/login", method = RequestMethod.GET)
+	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public ModelAndView login() {
 		return new ModelAndView("login");
 	}
@@ -25,7 +25,7 @@ public class loginControlador {
 	@RequestMapping(value = "/usuario", method = RequestMethod.GET)
 	@ResponseBody
 	public String usuario(Principal principal) {
-		User u = userDao.findByLogin(principal.getName());
+		Usuario u = userDao.findByLogin(principal.getName());
 		return u.getNombre()+" "+u.getApellidos()+" "+u.getRol().getNombre();
 	}
 }

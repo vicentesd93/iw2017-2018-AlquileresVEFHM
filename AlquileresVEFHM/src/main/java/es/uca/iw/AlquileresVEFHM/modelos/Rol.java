@@ -24,14 +24,14 @@ public class Rol {
 	@NotNull
 	private String nombre;
 	@OneToMany(mappedBy = "rol", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<User> usuarios;
+	private Set<Usuario> usuarios;
 	
 	public Rol() {}
 	public Rol(@NotNull String nombre) {
 		super();
 		this.nombre = nombre;
 	}
-	public Rol(@NotNull String nombre, Set<User> usuarios) {
+	public Rol(@NotNull String nombre, Set<Usuario> usuarios) {
 		super();
 		this.nombre = nombre;
 		this.usuarios = usuarios;
@@ -43,7 +43,7 @@ public class Rol {
 	public String getNombre() {
 		return nombre;
 	}
-	public Set<User> getUsuarios() {
+	public Set<Usuario> getUsuarios() {
 		return usuarios;
 	}
 	
@@ -53,7 +53,7 @@ public class Rol {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	public void setUsuarios(Set<User> usuarios) {
+	public void setUsuarios(Set<Usuario> usuarios) {
 		this.usuarios = usuarios;
 	}
 }

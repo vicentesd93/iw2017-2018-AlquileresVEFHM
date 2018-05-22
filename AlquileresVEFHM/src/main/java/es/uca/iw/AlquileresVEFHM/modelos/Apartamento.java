@@ -21,11 +21,11 @@ import javax.validation.constraints.NotNull;
 public class Apartamento {
 	@Id
 	@Column(name = "_id")
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Integer id;
 	@JoinColumn(name = "anfitrion", nullable = false)
 	@ManyToOne(fetch = FetchType.LAZY)
-	private User anfitrion;
+	private Usuario usuario;
 	@Column
 	@NotEmpty(message = "*Introduzca la descripción del inmueble")
 	@NotNull
@@ -68,14 +68,12 @@ public class Apartamento {
 	private boolean ascensor;
 	@OneToMany(mappedBy = "apartamento", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<Foto_apartamento> fotos_apartamento;
-	@OneToMany(mappedBy = "apartamento", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<Oferta> ofertas;
 	
 	public Apartamento() {}
 	
-	public Apartamento(User anfitrion, String descripcion, String direccion, String poblacion, String pais, Tipo_apartamento tipo_apartamento) {
+	public Apartamento(Usuario usuario, String descripcion, String direccion, String poblacion, String pais, Tipo_apartamento tipo_apartamento) {
 		super();
-		this.anfitrion = anfitrion;
+		this.usuario = usuario;
 		this.descripcion = descripcion;
 		this.direccion = direccion;
 		this.poblacion = poblacion;
@@ -83,11 +81,11 @@ public class Apartamento {
 		this.tipo_apartamento = tipo_apartamento;
 	}
 	
-	public Apartamento(User anfitrion, String descripcion, String direccion, String poblacion, String pais, Tipo_apartamento tipo_apartamento,
+	public Apartamento(Usuario usuario, String descripcion, String direccion, String poblacion, String pais, Tipo_apartamento tipo_apartamento,
 			Integer aseos, Integer dormitorios, Integer m2, boolean garaje, boolean mascotas, boolean amueblado,
 			boolean piscina, boolean jardin, boolean trastero, boolean ascensor, Set<Foto_apartamento> fotos_apartamento) {
 		super();
-		this.anfitrion = anfitrion;
+		this.usuario = usuario;
 		this.descripcion = descripcion;
 		this.direccion = direccion;
 		this.poblacion = poblacion;
@@ -112,11 +110,11 @@ public class Apartamento {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	public User getAnfitrion() {
-		return anfitrion;
+	public Usuario getUsuario() {
+		return usuario;
 	}
-	public void setAnfitrion(User anfitrion) {
-		this.anfitrion = anfitrion;
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 	public String getDescripcion() {
 		return descripcion;

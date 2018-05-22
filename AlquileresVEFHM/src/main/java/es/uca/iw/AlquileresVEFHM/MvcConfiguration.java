@@ -1,5 +1,5 @@
 package es.uca.iw.AlquileresVEFHM;
-/*
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -40,7 +40,7 @@ public class MvcConfiguration implements WebMvcConfigurer
        templateResolver.setSuffix(".html");
        return templateResolver;
     }*/
-    /*@Bean
+    @Bean
     public ClassLoaderTemplateResolver templateResolver() {
         
         ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
@@ -75,4 +75,3 @@ public class MvcConfiguration implements WebMvcConfigurer
        registry.viewResolver(resolver);
     }
 }
-*/
