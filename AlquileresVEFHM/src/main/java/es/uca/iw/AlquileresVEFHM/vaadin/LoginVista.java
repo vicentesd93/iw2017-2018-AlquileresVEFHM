@@ -7,51 +7,49 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.vaadin.event.ShortcutAction;
+import com.vaadin.navigator.View;
 import com.vaadin.server.Page;
-import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
-import com.vaadin.spring.annotation.SpringUI;
-import com.vaadin.spring.navigator.SpringViewProvider;
+import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.UI;
+import com.vaadin.ui.PasswordField;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
 
-import es.uca.iw.AlquileresVEFHM.seguridad.SeguridadUtil;
+@SpringView(name = LoginVista.VIEW_NAME)
+public class LoginVista extends VerticalLayout implements View{
+	public static final String VIEW_NAME = "login";
+	public LoginVista() {
+		setMargin(true);
+        setSpacing(true);
 
-@SpringUI
-public class VaadinUI extends UI {
-	@Autowired
-	SpringViewProvider viewProvider;
+        TextField usuario = new TextField("Usuario");
+        addComponent(usuario);
+
+        PasswordField clave = new PasswordField("Clave");
+        addComponent(clave);
+
+        Button login = new Button("Login", evt -> {
+            String pass = clave.getValue();
+            clave.setValue("");
+            if (!login(usuario.getValue(), pass)) {
+                Notification.show("Login fallido");
+                usuario.focus();
+            }
+        });
+        login.setClickShortcut(ShortcutAction.KeyCode.ENTER);
+        addComponent(login);
+	}
+	
+	@FunctionalInterface
+    public interface LoginCallback {
+        boolean login(String username, String password);
+	}
 	
 	@Autowired
 	AuthenticationManager authenticationManager;
-	
-	@Autowired
-	IndexVista indexVista;
-	
-	@Override
-    protected void init(VaadinRequest request) {
-		this.getUI().getNavigator().setErrorView(ErrorVista.class);
-		viewProvider.setAccessDeniedViewClass(AccesoDenegadoVista.class);
-		System.out.println("INICIO");
-		/*if (SeguridadUtil.isLoggedIn()) {
-			System.out.println("Index");
-			showIndexVista();
-			System.out.println("Index fin");
-		} else {
-			System.out.println("Login");
-			showLoginVista();
-			System.out.println("Login fin");
-		}*/
-		showIndexVista();
-	}
-	
-	/*private void showLoginVista() {
-		setContent(new LoginVista(this::login));
-	}*/
-	private void showIndexVista() {
-		setContent(indexVista);
-	}
 	
 	private boolean login(String username, String password) {
 		try {

@@ -1,7 +1,13 @@
 package es.uca.iw.AlquileresVEFHM.modelos;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -21,13 +27,16 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import es.uca.iw.AlquileresVEFHM.DAO.RolDAO;
+
 @Entity
 @Table(name="usuario")
-public class User implements UserDetails{
+public class User implements UserDetails{	
 	@Id
 	@Column(name = "_id")
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -213,37 +222,47 @@ public class User implements UserDetails{
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		// TODO Auto-generated method stub
-		return null;
+		Set<Rol> r = new HashSet<Rol>();
+		r.add(rol);
+		return r;
 	}
 	@Override
 	public String getPassword() {
-		// TODO Auto-generated method stub
-		return null;
+		return clave;
 	}
 	@Override
 	public String getUsername() {
-		// TODO Auto-generated method stub
-		return null;
+		return login;
 	}
 	@Override
 	public boolean isAccountNonExpired() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 	@Override
 	public boolean isAccountNonLocked() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 	@Override
 	public boolean isCredentialsNonExpired() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 	@Override
 	public boolean isEnabled() {
-		// TODO Auto-generated method stub
-		return false;
+		return activo;
+	}
+	
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", login=" + login + ", clave=" + clave + ", email=" + email + ", dni=" + dni
+				+ ", nombre=" + nombre + ", apellidos=" + apellidos + ", f_nacimiento=" + f_nacimiento + ", sexo="
+				+ sexo + ", direccion=" + direccion + ", telefono=" + telefono + ", rol=" + rol + ", f_creacion="
+				+ f_creacion + ", activo=" + activo + ", apartamentos=" + apartamentos + ", reservas=" + reservas + "]";
+	}
+	public LocalDate getLDF_nacimiento() {
+		if(f_nacimiento == null) return null;
+		return Instant.ofEpochMilli(f_nacimiento.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+	}
+	public void setLDF_nacimiento(LocalDate F_nacimiento) {
+		f_nacimiento = Date.from(F_nacimiento.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
 	}
 }

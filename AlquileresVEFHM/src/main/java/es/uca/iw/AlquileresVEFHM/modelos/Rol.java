@@ -13,9 +13,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.security.core.GrantedAuthority;
+
 @Entity
 @Table(name="rol")
-public class Rol {
+public class Rol implements GrantedAuthority {
 	@Id
 	@Column(name="_id")
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -55,5 +57,9 @@ public class Rol {
 	}
 	public void setUsuarios(Set<User> usuarios) {
 		this.usuarios = usuarios;
+	}
+	@Override
+	public String getAuthority() {
+		return nombre;
 	}
 }
