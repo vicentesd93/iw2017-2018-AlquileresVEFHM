@@ -63,8 +63,8 @@ public class IndexVista extends VerticalLayout implements ViewDisplay {
 			barraNavegacion.addComponent(crearBotonNavegacion("Registro", RegistroUsuarioVista.NOMBRE));
 		}else {
 			//barraNavegacion.addComponent(new Label(" Hola, "+Usuario().getNombre()+" "+Usuario().getApellidos()+" "));
-			barraNavegacion.addComponent(crearBotonNavegacion("Mi cuenta", CuentaUsuarioVista.NOMBRE));
 			Button cuentaButton = new Button("Mi cuenta");
+			cuentaButton.addStyleName(ValoTheme.BUTTON_SMALL);
 			cuentaButton.addClickListener(event -> getUI().getNavigator().addView("cuenta", new CuentaUsuarioVista(Usuario())));
 			cuentaButton.addClickListener(event -> getUI().getNavigator().navigateTo("cuenta"));
 			barraNavegacion.addComponent(cuentaButton);
@@ -83,8 +83,9 @@ public class IndexVista extends VerticalLayout implements ViewDisplay {
 		springViewDisplay.setSizeFull();
 		root.addComponent(springViewDisplay);
 		root.setExpandRatio(springViewDisplay, 1.0f);
-
 		addComponent(root);
+		
+		setSizeFull();
 	}
 	@Autowired
 	private UserDAO userDao;
