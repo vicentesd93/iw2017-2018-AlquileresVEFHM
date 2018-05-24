@@ -1,18 +1,30 @@
 package es.uca.iw.AlquileresVEFHM.vaadin;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Date;
+
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.data.Binder;
+import com.vaadin.data.ValidationException;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.navigator.View;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.DateField;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.ItemCaptionGenerator;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.RadioButtonGroup;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -21,6 +33,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.User;
 import es.uca.iw.AlquileresVEFHM.seguridad.SeguridadUtil;
+import es.uca.iw.AlquileresVEFHM.seguridad.UserService;
 
 @SpringView(name = CuentaUsuarioVista.NOMBRE)
 public class CuentaUsuarioVista extends HorizontalLayout implements View {
@@ -73,7 +86,7 @@ public class CuentaUsuarioVista extends HorizontalLayout implements View {
 		HorizontalLayout hfcre = new HorizontalLayout();
 		Label  lb_f_creacion = new Label("Fecha de Creacion: ");
 		lb_f_creacion.addStyleName(ValoTheme.LABEL_LARGE);
-		Label  f_creacion = new Label(usuario.getF_creacion().toGMTString());
+		Label  f_creacion = new Label(usuario.getF_creacion().toLocaleString());
 		f_creacion.addStyleName(ValoTheme.LABEL_LIGHT);
 		hfcre.addComponent(lb_f_creacion);
 		hfcre.addComponent(f_creacion);
@@ -82,7 +95,7 @@ public class CuentaUsuarioVista extends HorizontalLayout implements View {
 		HorizontalLayout hnaci = new HorizontalLayout();
 		Label  lb_f_nacimiento = new Label("Fecha de Nacimiento: ");
 		lb_f_nacimiento.addStyleName(ValoTheme.LABEL_LARGE);
-		Label  f_nacimiento = new Label(usuario.getF_nacimiento().toGMTString());
+		Label  f_nacimiento = new Label(usuario.getF_nacimiento().toLocaleString());
 		f_nacimiento.addStyleName(ValoTheme.LABEL_LIGHT);
 		hnaci.addComponent(lb_f_nacimiento);
 		hnaci.addComponent(f_nacimiento);
@@ -158,15 +171,97 @@ public class CuentaUsuarioVista extends HorizontalLayout implements View {
 		
 		Binder<User> binder = new Binder<>();
 		        
-        TextField usuario = new TextField("Nombre usuario");
-        usuario.setValue(SeguridadUtil.getLoginUsuarioLogeado());
-        binder.forField(usuario)
+        TextField nombreUser = new TextField("Nombre");
+        nombreUser.setValue(userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado()).getNombre());
+        binder.forField(nombreUser)
         	.asRequired("Introduzca un nombre de usuario")
-        	.withValidator(login -> userDao.findByLogin(login) == null || SeguridadUtil.getLoginUsuarioLogeado() == login, "Ya existe un usuario con ese nombre")
-        	.bind(User::getLogin, User::setLogin);
+        	.bind(User::getNombre, User::setNombre);
        
-        vl.addComponent(usuario);
+        vl.addComponent(nombreUser);
+        
+        TextField apellidosUser = new TextField("Apellidos");
+        apellidosUser.setValue(userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado()).getApellidos());
+        binder.forField(apellidosUser)
+        	.asRequired("Introduzca los apellidos")
+        	.bind(User::getApellidos, User::setApellidos);
        
+        vl.addComponent(apellidosUser);
+        
+        TextField emailUser = new TextField("Correo electronico");
+        emailUser.setValue(userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado()).getEmail());
+        binder.forField(emailUser)
+        	.asRequired("Introduzca su correo electronico")
+        	.withValidator(new EmailValidator("Introduzca un correo electronico válido"))
+        	.withValidator(mail -> userDao.findByEmail(mail) == null, "Ya existe un usuario con ese correo electronico.")
+        	.bind(User::getEmail, User::setEmail);
+
+        vl.addComponent(emailUser);
+        
+        TextField direccionUser = new TextField("Dirección");
+        direccionUser.setValue(userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado()).getDireccion());
+        binder.forField(direccionUser)
+        	.asRequired("Introduzca la dirección")
+        	.bind(User::getDireccion, User::setDireccion);
+       
+        vl.addComponent(direccionUser);
+        
+        TextField telUser = new TextField("Telefono");
+        telUser.setValue(userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado()).getTelefono());
+        binder.forField(telUser)
+        	.asRequired("Introduzca el telefono")
+        	.bind(User::getTelefono, User::setTelefono);
+       
+        vl.addComponent(telUser);
+        
+        DateField fechNacUser = new DateField("Fecha de nacimiento");
+        fechNacUser.setValue(userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado()).getLDF_nacimiento());
+        binder.forField(fechNacUser)
+    		.asRequired("Introduzca su fecha de nacimiento")
+    		.bind(User::getLDF_nacimiento, User::setLDF_nacimiento);
+       
+        vl.addComponent(fechNacUser);
+        
+        RadioButtonGroup<Boolean> sexoUser = new RadioButtonGroup<>("Sexo");
+        if(userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado()).isSexo())
+        	sexoUser.setItems(Boolean.FALSE, Boolean.TRUE);
+        else
+        	sexoUser.setItems(Boolean.TRUE, Boolean.FALSE);
+  
+        sexoUser.setValue(Boolean.TRUE);
+        sexoUser.setItemCaptionGenerator(new ItemCaptionGenerator<Boolean>() {
+			private static final long serialVersionUID = 1L;
+			@Override
+        	public String apply(Boolean item) {
+        		return item ? "Mujer" : "Hombre";
+        	}
+        });
+        binder.forField(sexoUser).bind(User::isSexo, User::setSexo);
+        vl.addComponent(sexoUser);
+        
+        Button Guardar = new Button("Guardar", event -> {
+      	  if (binder.validate().isOk()) {
+      		  User u = userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado());
+      		  try {
+					binder.writeBean(u);
+					u.setNombre(nombreUser.getValue());
+					u.setApellidos(apellidosUser.getValue());
+					u.setDireccion(direccionUser.getValue());
+					u.setTelefono(telUser.getValue());
+					u.setF_nacimiento(Date.from(fechNacUser.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+					u.setSexo(sexoUser.getValue());
+					userDao.save(u);
+					Notification.show("Usuario modificado");
+				} catch (ValidationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+      		  
+      	  }else {
+      		  Notification.show("Revise los datos e intentelo de nuevo");
+      	  }
+      });
+      vl.addComponent(Guardar);
+        
 		return vl;
 	}
 	
