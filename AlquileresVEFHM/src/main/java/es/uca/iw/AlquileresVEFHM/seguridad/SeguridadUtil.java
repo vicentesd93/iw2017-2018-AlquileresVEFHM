@@ -4,17 +4,10 @@ import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import com.vaadin.server.Page;
-import com.vaadin.server.VaadinService;
-
-import es.uca.iw.AlquileresVEFHM.modelos.User;
 
 public final class SeguridadUtil {
 	@Autowired
@@ -32,13 +25,16 @@ public final class SeguridadUtil {
         return authentication != null && authentication.getAuthorities().contains(new SimpleGrantedAuthority(rol));
     }
     
-    public static Collection<? extends GrantedAuthority> roles() {
+    public static Collection<? extends GrantedAuthority> getRoles() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication != null ){
-        	return authentication.getAuthorities();
-        } else{
-        	return null;
-        }
+        if(authentication != null ) return authentication.getAuthorities();
+        return null;
+    }
+    
+    public static String getRol() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication != null ) return authentication.getAuthorities().iterator().next().getAuthority();
+        return null;
     }
     
     public static String getLoginUsuarioLogeado() {
@@ -46,20 +42,4 @@ public final class SeguridadUtil {
     	if(aut != null) return aut.getName();
     	return "";
     }
-    public boolean login(String username, String password) {
-		try {
-			Authentication token = authenticationManager
-					.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-			// Reinitialize the session to protect against session fixation
-			// attacks. This does not work with websocket communication.
-			VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
-			SecurityContextHolder.getContext().setAuthentication(token);
-			Page.getCurrent().reload();
-			// Show the main UI
-			//showIndexVista();
-			return true;
-		} catch (AuthenticationException ex) {
-			return false;
-		}
-	}
 }

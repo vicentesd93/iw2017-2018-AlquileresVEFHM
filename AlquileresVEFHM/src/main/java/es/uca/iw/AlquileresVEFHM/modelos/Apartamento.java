@@ -214,4 +214,14 @@ public class Apartamento {
 	public void setFotos_apartamento(Set<Foto_apartamento> fotos_apartamento) {
 		this.fotos_apartamento = fotos_apartamento;
 	}
+
+	@Override
+	public String toString() {
+		return "Apartamento [id=" + id + ", descripcion=" + descripcion + ", direccion="
+				+ direccion + ", poblacion=" + poblacion + ", pais=" + pais + ", tipo_apartamento=" + tipo_apartamento
+				+ ", aseos=" + aseos + ", dormitorios=" + dormitorios + ", m2=" + m2 + ", garaje=" + garaje
+				+ ", mascotas=" + mascotas + ", amueblado=" + amueblado + ", piscina=" + piscina + ", jardin=" + jardin
+				+ ", trastero=" + trastero + ", ascensor=" + ascensor + "]";
+	}
+	
 }

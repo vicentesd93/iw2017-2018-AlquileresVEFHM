@@ -1,11 +1,10 @@
 package es.uca.iw.AlquileresVEFHM.DAO;
 
-import javax.transaction.Transactional;
-
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.uca.iw.AlquileresVEFHM.modelos.Apartamento;
 
-@Transactional
 public interface ApartamentoDAO extends CrudRepository<Apartamento, Integer> {
 }

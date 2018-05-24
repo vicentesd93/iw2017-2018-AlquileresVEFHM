@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.navigator.View;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinService;
 import com.vaadin.spring.annotation.SpringView;
@@ -17,6 +18,7 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
 
 @SpringView(name = LoginVista.VIEW_NAME)
 public class LoginVista extends VerticalLayout implements View{
@@ -27,8 +29,10 @@ public class LoginVista extends VerticalLayout implements View{
 
         TextField usuario = new TextField("Usuario");
         addComponent(usuario);
-
+        
         PasswordField clave = new PasswordField("Clave");
+        clave.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
+        clave.setIcon(FontAwesome.LOCK);
         addComponent(clave);
 
         Button login = new Button("Login", evt -> {

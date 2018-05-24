@@ -1,39 +1,48 @@
 package es.uca.iw.AlquileresVEFHM.vaadin;
 
-import com.vaadin.navigator.Navigator;
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewDisplay;
 import com.vaadin.spring.annotation.SpringView;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.User;
+import es.uca.iw.AlquileresVEFHM.seguridad.SeguridadUtil;
 
-@SpringView()
+@SpringView(name = CuentaUsuarioVista.NOMBRE)
 public class CuentaUsuarioVista extends HorizontalLayout implements View {
+	private static final long serialVersionUID = 1L;
 	public final static String NOMBRE = "cuenta_usuario";
 	private User usuario;
+	private UserDAO userDao;
 	
 	private Component datos() {
 		VerticalLayout vl = new VerticalLayout();
 		vl.setSizeFull();
-		Label titulo = new Label("Datos personales");
+		Label titulo = new Label("Datos personales" + usuario.getNombre());
 		titulo.addStyleName(ValoTheme.LABEL_HUGE);
 		vl.addComponent(titulo);
 		return vl;
 	}
 	
-	public CuentaUsuarioVista(User u) {
-		usuario = u;
-		//COMPROBAR QUE SEA UN USUARIO
+	@Autowired
+	public CuentaUsuarioVista(UserDAO ud) {
+		userDao = ud;
+	}
+	
+	@PostConstruct
+	void init() {
+		usuario = userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado());
+
 		setSizeFull();
 		TabSheet tabs = new TabSheet();
 		tabs.setSizeFull();

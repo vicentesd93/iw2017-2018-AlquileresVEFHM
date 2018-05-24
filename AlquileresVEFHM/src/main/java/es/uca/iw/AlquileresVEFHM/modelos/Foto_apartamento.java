@@ -1,6 +1,9 @@
 package es.uca.iw.AlquileresVEFHM.modelos;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.sql.Blob;
+import java.sql.SQLException;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,6 +17,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+
+import com.vaadin.server.StreamResource;
+import com.vaadin.server.StreamResource.StreamSource;
 
 @Entity
 @Table(name = "foto_apartamento")
@@ -68,5 +74,20 @@ public class Foto_apartamento {
 	}
 	public void setFoto(Blob foto) {
 		this.foto = foto;
-	}	
+	}
+	
+	public StreamResource getStreamResource() {
+		return new StreamResource(new StreamSource() {
+			@Override
+			public InputStream getStream() {
+				InputStream is = null;
+				try {
+					is = new ByteArrayInputStream(foto.getBytes(1, (int)foto.length()));
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				return is;
+			}
+		}, nombre);
+	}
 }

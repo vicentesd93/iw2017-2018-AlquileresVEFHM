@@ -1,8 +1,8 @@
 package es.uca.iw.AlquileresVEFHM.vaadin;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.Set;
+
+import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -12,10 +12,8 @@ import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.navigator.View;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.ItemCaptionGenerator;
-import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.PasswordField;
@@ -30,18 +28,21 @@ import es.uca.iw.AlquileresVEFHM.seguridad.UserService;
 
 @SpringView(name = RegistroUsuarioVista.NOMBRE)
 public class RegistroUsuarioVista extends VerticalLayout implements View {
+	private static final long serialVersionUID = 1L;
 	public static final String NOMBRE = "registro_usuario";
-	
-	@Autowired
 	private UserDAO userDao;
-	
-	@Autowired
 	private RolDAO rolDao;
-	
-	@Autowired
 	private UserService us;
 	
-	public RegistroUsuarioVista() {
+	@Autowired
+	public RegistroUsuarioVista(UserDAO ud, RolDAO rd, UserService us) {
+		userDao = ud;
+		rolDao = rd;
+		this.us = us;
+	}
+	
+	@PostConstruct
+	void init() {
 		setMargin(true);
         setSpacing(true);
 
@@ -116,7 +117,8 @@ public class RegistroUsuarioVista extends VerticalLayout implements View {
         sexo.setItems(Boolean.TRUE, Boolean.FALSE);
         sexo.setValue(Boolean.TRUE);
         sexo.setItemCaptionGenerator(new ItemCaptionGenerator<Boolean>() {
-        	@Override
+			private static final long serialVersionUID = 1L;
+			@Override
         	public String apply(Boolean item) {
         		return item ? "Mujer" : "Hombre";
         	}
@@ -127,6 +129,7 @@ public class RegistroUsuarioVista extends VerticalLayout implements View {
         NativeSelect<Integer> rol = new NativeSelect<>("Tipo usuario");
         rol.setItems(1,2);
         rol.setItemCaptionGenerator(new ItemCaptionGenerator<Integer>() {
+			private static final long serialVersionUID = 1L;
 			@Override
 			public String apply(Integer item) {
 				String etiqueta = "";

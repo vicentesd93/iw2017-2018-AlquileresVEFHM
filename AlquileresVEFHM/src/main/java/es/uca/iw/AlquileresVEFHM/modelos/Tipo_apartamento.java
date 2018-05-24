@@ -59,5 +59,9 @@ public class Tipo_apartamento {
 	public void setApartamentos(Set<Apartamento> apartamentos) {
 		this.apartamentos = apartamentos;
 	}
+	@Override
+	public String toString() {
+		return nombre;
+	}
 	
 }
