@@ -1,15 +1,9 @@
 package es.uca.iw.AlquileresVEFHM.vaadin;
 
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Date;
-
 import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.data.Binder;
 import com.vaadin.data.ValidationException;
 import com.vaadin.data.validator.EmailValidator;
@@ -33,7 +27,6 @@ import com.vaadin.ui.themes.ValoTheme;
 import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.User;
 import es.uca.iw.AlquileresVEFHM.seguridad.SeguridadUtil;
-import es.uca.iw.AlquileresVEFHM.seguridad.UserService;
 
 @SpringView(name = CuentaUsuarioVista.NOMBRE)
 public class CuentaUsuarioVista extends HorizontalLayout implements View {
