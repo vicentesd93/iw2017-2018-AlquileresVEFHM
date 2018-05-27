@@ -1,6 +1,8 @@
 package es.uca.iw.AlquileresVEFHM.vaadin;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -8,16 +10,22 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.vaadin.data.Binder;
+import com.vaadin.data.ValidationException;
 import com.vaadin.event.selection.SelectionEvent;
 import com.vaadin.event.selection.SelectionListener;
 import com.vaadin.navigator.View;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.UserError;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.DateField;
+import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
@@ -33,6 +41,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import es.uca.iw.AlquileresVEFHM.DAO.ApartamentoDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.Foto_apartamentoDAO;
+import es.uca.iw.AlquileresVEFHM.DAO.OfertaDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.Apartamento;
 import es.uca.iw.AlquileresVEFHM.modelos.Foto_apartamento;
@@ -48,14 +57,18 @@ public class ApartamentosVista extends VerticalLayout implements View {
 	private final UserDAO userDao;
 	private final ApartamentoDAO aparDao;
 	private final Foto_apartamentoDAO faDao;
+	private final OfertaDAO ofertaDao;
 	
 	private Integer windowfotoindice = 0;
+	private Apartamento apartamento;
+	private Set<Oferta> ofertas;
 	
 	@Autowired
-	public ApartamentosVista(UserDAO ud, ApartamentoDAO ad, Foto_apartamentoDAO fd) {
+	public ApartamentosVista(UserDAO ud, ApartamentoDAO ad, Foto_apartamentoDAO fd, OfertaDAO od) {
 		userDao = ud;
 		aparDao = ad;
 		faDao = fd;
+		ofertaDao = od;
 	}
 
 	@PostConstruct
@@ -101,28 +114,134 @@ public class ApartamentosVista extends VerticalLayout implements View {
 		opciones.addComponent(crearBotonOpcion("Ofertas", new ClickListener() {
 			@Override
 			public void buttonClick(ClickEvent event) {
-					Set<Oferta> ofertas;
-					Window wofertas = new Window("Ofertas");
-					wofertas.setResizable(false);
-					wofertas.setDraggable(false);
-					wofertas.setModal(true);
-					wofertas.setWidth("70%");
-					wofertas.setHeight("70%");
-					
-					VerticalLayout vl = new VerticalLayout();
-					wofertas.setContent(vl);
-					
-					Label titulo = new Label("Ofertas");
-					titulo.addStyleName(ValoTheme.LABEL_HUGE);
-					vl.addComponent(titulo);
-					
-					Label existentes = new Label("Ofertas actuales");
-					existentes.addStyleName(ValoTheme.LABEL_H3);
-					vl.addComponent(existentes);
-					
-					Grid<Apartamento> grid = new Grid<>();
-					grid.setSizeFull();
-					grid.setItems(apartamentos);
+				apartamento = grid.asSingleSelect().getOptionalValue().get();
+				ofertas = apartamento.getOfertas();
+				
+				Window wofertas = new Window("Ofertas");
+				wofertas.setResizable(false);
+				wofertas.setDraggable(false);
+				wofertas.setModal(true);
+				wofertas.setWidth("70%");
+				wofertas.setHeight("70%");
+				
+				VerticalLayout vl = new VerticalLayout();
+				wofertas.setContent(vl);
+				
+				Label titulo = new Label("Ofertas");
+				titulo.addStyleName(ValoTheme.LABEL_HUGE);
+				vl.addComponent(titulo);
+				
+				Label existentes = new Label("Ofertas actuales");
+				existentes.addStyleName(ValoTheme.LABEL_H3);
+				vl.addComponent(existentes);
+				
+				Grid<Oferta> gridoferta = new Grid<>();
+				gridoferta.setSizeFull();
+				gridoferta.setItems(ofertas);
+				gridoferta.setSelectionMode(SelectionMode.NONE);
+				gridoferta.addColumn(Oferta::getFecha).setCaption("Fecha").setId("fecha");
+				gridoferta.addColumn(Oferta::getPrecio).setCaption("Precio");
+				gridoferta.addColumn(Oferta::getPenalizacion).setCaption("Penalización");
+				gridoferta.addComponentColumn(oferta -> {
+					CheckBox reservado = new CheckBox();
+					if(oferta.getReserva() != null) reservado.setValue(oferta.getReserva().isAceptada());
+					else reservado.setValue(false);
+					reservado.setReadOnly(true);
+					return reservado;
+				}).setCaption("Reservado");
+				gridoferta.sort("fecha");
+				vl.addComponent(gridoferta);
+				
+				Label nueva = new Label("Nueva oferta");
+				nueva.addStyleName(ValoTheme.LABEL_H3);
+				vl.addComponent(nueva);
+				
+				FormLayout fl = new FormLayout();
+				vl.addComponent(fl);
+				Binder<Oferta> binder = new Binder<>();
+				DateField f_ini = new DateField("Fecha inicio");
+				f_ini.setValue(LocalDate.now());
+				binder.forField(f_ini)
+					.asRequired()
+					.withValidator(fecha -> fecha.compareTo(LocalDate.now()) > -1, "La fecha debe ser futura")
+					.bind(Oferta::getLDFecha,Oferta::setLDFecha);
+				fl.addComponent(f_ini);
+				
+				DateField f_fin = new DateField("Fecha fin");
+				f_fin.setValue(LocalDate.now());
+				binder.forField(f_fin)
+					.asRequired()
+					.withValidator(fecha -> fecha.compareTo(f_ini.getValue()) > -1, "La fecha debe ser mayor que la de la fecha de inicio")
+					.bind(Oferta::getLDFecha,Oferta::setLDFecha);
+				fl.addComponent(f_fin);
+
+				TextField precio = new TextField("Precio");
+				binder.forField(precio)
+					.asRequired()
+			    	.withConverter(Float::valueOf, String::valueOf, "Debe introducir un numero")
+					.withValidator(pre -> pre >= 0.0f, "El precio debe ser positivo")
+					.bind(Oferta::getPrecio, Oferta::setPrecio);
+				fl.addComponent(precio);
+				
+				TextField penalizacion = new TextField("Penalización (%)");
+				binder.forField(penalizacion)
+					.asRequired()
+			    	.withConverter(Float::valueOf, String::valueOf, "Debe introducir un numero")
+					.withValidator(pe -> pe >= 0.0f, "La penalización ser positivo")
+					.bind(Oferta::getPenalizacion, Oferta::setPenalizacion);
+				fl.addComponent(penalizacion);
+				
+				Button registrar = new Button("Registrar", new ClickListener() {
+					@Override
+					public void buttonClick(ClickEvent event) {
+						if(binder.isValid()) {
+							LocalDate fec = f_ini.getValue();
+							Set<LocalDate> fechascogidas = new HashSet<LocalDate>();
+							Set<LocalDate> fechaserroneas = new HashSet<LocalDate>();
+							for(Oferta ofer : ofertas) fechascogidas.add(ofer.getLDFecha());
+							while(fec.compareTo(f_fin.getValue()) != 1) {
+								if(fechascogidas.contains(fec)) {
+									fechaserroneas.add(fec);
+								}
+								System.out.println(fec.toString());
+								fec = fec.plusDays(1);
+							}
+							if(fechaserroneas.isEmpty()) {
+								fec = f_ini.getValue();
+								Oferta ofer = new Oferta();
+								while(fec.compareTo(f_fin.getValue()) != 1) {
+									try {
+										binder.writeBean(ofer);
+										ofer.setApartamento(grid.asSingleSelect().getOptionalValue().get());
+										ofer.setLDFecha(fec);
+										ofertaDao.save(ofer);
+									} catch (ValidationException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+									fec = fec.plusDays(1);
+								}
+								Notification.show("Ofertas registradas correctamente", Notification.TYPE_TRAY_NOTIFICATION);
+								apartamento = aparDao.findById(grid.asSingleSelect().getOptionalValue().get().getId()).get();
+								ofertas = apartamento.getOfertas();
+								gridoferta.setItems(ofertas);
+								gridoferta.sort("fecha");
+								gridoferta.getDataProvider().refreshAll();
+							} else {
+								String errorfecha;
+								if(fechaserroneas.size() == 1) errorfecha = "Ya existe una oferta para el dia: ";
+								else errorfecha = "Ya existe una oferta para los dias: ";
+								for(LocalDate fechaerronea : fechaserroneas) errorfecha += "\n" + fechaerronea;
+								f_ini.setComponentError(new UserError("Fecha errónea"));
+								f_fin.setComponentError(new UserError("Fecha errónea"));
+								Notification.show(errorfecha, Notification.TYPE_ERROR_MESSAGE);
+							}
+						}
+					}
+				});
+				fl.addComponent(registrar);
+				
+				getUI().getUI().addWindow(wofertas);
 			}
 		}));
 		

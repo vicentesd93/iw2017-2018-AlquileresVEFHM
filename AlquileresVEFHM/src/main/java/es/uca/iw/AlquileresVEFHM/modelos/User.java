@@ -29,6 +29,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+@SuppressWarnings("serial")
 @Entity
 @Table(name="usuario")
 public class User implements UserDetails{	

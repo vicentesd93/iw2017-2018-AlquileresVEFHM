@@ -8,6 +8,7 @@ import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.UI;
 
+@SuppressWarnings("serial")
 @SpringUI
 public class VaadinUI extends UI {
 	@Autowired

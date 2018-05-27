@@ -38,10 +38,11 @@ public class IndexVista extends VerticalLayout implements ViewDisplay {
 
 	@PostConstruct
 	void init() {
+		
 		final VerticalLayout root = new VerticalLayout();
-		root.setSizeFull();
+		root.setWidth("100%");
 
-		root.addComponent(new Label("Sesion: " + VaadinSession.getCurrent()));
+		/*root.addComponent(new Label("Sesion: " + VaadinSession.getCurrent()));
 		
 		root.addComponent(new Label("UI: " + this.toString()));
 		
@@ -52,10 +53,11 @@ public class IndexVista extends VerticalLayout implements ViewDisplay {
 		if(SeguridadUtil.isLoggedIn()) {
 			root.addComponent(new Label("Rol: " + SeguridadUtil.getRol()));
 		}
-
+*/
+		
 		final CssLayout barraNavegacion = new CssLayout();
 		barraNavegacion.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
-		barraNavegacion.addComponent(crearBotonNavegacion("Inicio", LoginVista.VIEW_NAME));
+		barraNavegacion.addComponent(crearBotonNavegacion("Inicio", AnunciosMostrarVista.NOMBRE));
 		barraNavegacion.addComponent(crearBotonNavegacion("Buscar", LoginVista.VIEW_NAME));
 		barraNavegacion.addComponent(crearBotonNavegacion("Contacto", LoginVista.VIEW_NAME));
 
@@ -100,7 +102,7 @@ public class IndexVista extends VerticalLayout implements ViewDisplay {
 		root.setExpandRatio(springViewDisplay, 1.0f);
 		addComponent(root);
 		
-		setSizeFull();
+		setWidth("100%");
 	}
 	
 	private Button crearBotonNavegacion(String Titulo, final String Nombre_vista) {

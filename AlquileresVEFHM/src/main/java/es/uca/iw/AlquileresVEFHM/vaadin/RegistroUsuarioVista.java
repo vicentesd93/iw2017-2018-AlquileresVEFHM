@@ -95,7 +95,6 @@ public class RegistroUsuarioVista extends VerticalLayout implements View {
         addComponent(apellidos);
         
         DateField f_nacimiento = new DateField("Fecha de nacimiento");
-        f_nacimiento.setValue(LocalDate.now());
         binder.forField(f_nacimiento)
     	.asRequired("Introduzca su fecha de nacimiento")
     	.bind(User::getLDF_nacimiento, User::setLDF_nacimiento);

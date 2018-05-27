@@ -31,6 +31,5 @@ public class UserService implements UserDetailsService {
 		user.setActivo(true);
 		return userDao.save(user);
 	}
-	
-	
+
 }

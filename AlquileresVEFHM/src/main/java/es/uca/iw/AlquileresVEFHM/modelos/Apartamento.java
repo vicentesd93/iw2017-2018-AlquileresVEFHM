@@ -215,6 +215,14 @@ public class Apartamento {
 		this.fotos_apartamento = fotos_apartamento;
 	}
 
+	public Set<Oferta> getOfertas() {
+		return ofertas;
+	}
+
+	public void setOfertas(Set<Oferta> ofertas) {
+		this.ofertas = ofertas;
+	}
+
 	@Override
 	public String toString() {
 		return "Apartamento [id=" + id + ", descripcion=" + descripcion + ", direccion="
