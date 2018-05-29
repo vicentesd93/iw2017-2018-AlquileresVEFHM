@@ -20,9 +20,9 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-@SpringView(name = LoginVista.VIEW_NAME)
+@SpringView(name = LoginVista.NOMBRE)
 public class LoginVista extends VerticalLayout implements View{
-	public static final String VIEW_NAME = "login";
+	public static final String NOMBRE = "login";
 	public LoginVista() {
 		setMargin(true);
         setSpacing(true);

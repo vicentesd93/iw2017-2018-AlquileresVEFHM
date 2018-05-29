@@ -8,6 +8,7 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.navigator.View;
+import com.vaadin.server.BrowserWindowOpener;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
@@ -21,6 +22,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 import es.uca.iw.AlquileresVEFHM.DAO.ApartamentoDAO;
@@ -38,7 +40,7 @@ public class AnunciosMostrarVista extends VerticalLayout implements View {
 	private final UserDAO userDao;
 	
 	private List<Apartamento> apartamentos;
-	private Integer anuncios = 1;
+	private Integer anuncios = 3;
 	
 	@Autowired
 	public AnunciosMostrarVista(ApartamentoDAO ad, UserDAO ud) {
@@ -77,7 +79,14 @@ public class AnunciosMostrarVista extends VerticalLayout implements View {
 				
 				hl.addComponent(new Label(apartamento.getDescripcion()));
 				
-				hl.addComponent(new Button("Ver mas"));
+				Button ver = new Button("Ver mas");
+				ver.addClickListener(new ClickListener() {
+					@Override
+					public void buttonClick(ClickEvent event) {
+						getUI().getNavigator().navigateTo(AnuncioVerVista.NOMBRE + "/" + apartamento.getId());
+					}
+				});
+				hl.addComponent(ver);
 				
 				vl.addComponent(hl);
 				vl.setComponentAlignment(hl, Alignment.MIDDLE_CENTER);
@@ -85,7 +94,7 @@ public class AnunciosMostrarVista extends VerticalLayout implements View {
 				i = anuncios;
 			}
 		}
-		int paginas = apartamentos.size()/anuncios;
+		int paginas = (int) Math.ceil((float)apartamentos.size()/anuncios);
 		HorizontalLayout nav = new HorizontalLayout();
 		if(pagina != 1) {
 			Button anterior = new Button();
@@ -132,6 +141,7 @@ public class AnunciosMostrarVista extends VerticalLayout implements View {
 				nav.addComponent(b);
 			}
 		}
+		System.out.println(pagina + " " + paginas);
 		if(pagina != paginas) {
 			Button siguiente = new Button();
 			siguiente.setIcon(FontAwesome.ARROW_RIGHT);
@@ -149,4 +159,47 @@ public class AnunciosMostrarVista extends VerticalLayout implements View {
 		vl.addComponent(nav);
 		vl.setComponentAlignment(nav, Alignment.MIDDLE_CENTER);
 	}
+	
+/*	private Window veranuncio(Apartamento apartamento) {
+		Window anuncio = new Window();
+		anuncio.setModal(true);
+		anuncio.setDraggable(false);
+		anuncio.setResizable(false);
+		anuncio.setWidth("70%");
+		anuncio.setHeight("70%");
+		VerticalLayout vl = new VerticalLayout();
+		GridLayout panfoto = new GridLayout();
+		panfoto.setWidth("50%");
+		
+		Image foto = new Image();
+		foto.setSource(apartamento.getFotos_apartamento().iterator().next().getStreamResource());
+		foto.setSizeFull();
+		panfoto.addComponent(foto);
+		panfoto.setComponentAlignment(foto, Alignment.MIDDLE_CENTER);
+		vl.addComponent(panfoto);
+		vl.setComponentAlignment(panfoto, Alignment.MIDDLE_CENTER);
+		
+		Label titulo = new Label("Descripción");
+		titulo.addStyleName(ValoTheme.LABEL_H3);
+		vl.addComponent(titulo);
+		
+		Label contenido = new Label(apartamento.getDescripcion());
+		vl.addComponent(contenido);
+		
+		vl.addComponent(new Label("Aqui iria los servicios"));
+		
+		if(!SeguridadUtil.isLoggedIn()) {
+		if(SeguridadUtil.getRol().equals("Huesped")) {
+			Button login = new Button("Inicie sesión como huesped para reservar");
+			login.addClickListener(new ClickListener() {
+
+				@Override
+				public void buttonClick(ClickEvent event) {					
+					getUI().getNavigator().navigateTo(LoginVista.NOMBRE);
+				}
+			});
+		}
+		anuncio.setContent(vl);
+		return anuncio;
+	}*/
 }

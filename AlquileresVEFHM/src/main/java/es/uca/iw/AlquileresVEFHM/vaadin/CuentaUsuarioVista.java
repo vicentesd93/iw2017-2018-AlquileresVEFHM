@@ -3,11 +3,18 @@ package es.uca.iw.AlquileresVEFHM.vaadin;
 import java.time.ZoneId;
 import java.util.Date;
 import javax.annotation.PostConstruct;
+import javax.persistence.EntityManager;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import com.vaadin.data.Binder;
 import com.vaadin.data.ValidationException;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.navigator.View;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Page;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -18,6 +25,7 @@ import com.vaadin.ui.ItemCaptionGenerator;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.RadioButtonGroup;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TextField;
@@ -34,6 +42,8 @@ public class CuentaUsuarioVista extends HorizontalLayout implements View {
 	public final static String NOMBRE = "cuenta_usuario";
 	private User usuario;
 	private UserDAO userDao;
+	private PasswordEncoder passwordEncoder;
+	private EntityManager manager;
 	
 	private Component misDatos() {
 		
@@ -185,7 +195,6 @@ public class CuentaUsuarioVista extends HorizontalLayout implements View {
         binder.forField(emailUser)
         	.asRequired("Introduzca su correo electronico")
         	.withValidator(new EmailValidator("Introduzca un correo electronico válido"))
-        	.withValidator(mail -> userDao.findByEmail(mail) == null, "Ya existe un usuario con ese correo electronico.")
         	.bind(User::getEmail, User::setEmail);
 
         vl.addComponent(emailUser);
@@ -214,13 +223,10 @@ public class CuentaUsuarioVista extends HorizontalLayout implements View {
        
         vl.addComponent(fechNacUser);
         
+
         RadioButtonGroup<Boolean> sexoUser = new RadioButtonGroup<>("Sexo");
-        if(userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado()).isSexo())
-        	sexoUser.setItems(Boolean.FALSE, Boolean.TRUE);
-        else
-        	sexoUser.setItems(Boolean.TRUE, Boolean.FALSE);
-  
-        sexoUser.setValue(Boolean.TRUE);
+        sexoUser.setItems(Boolean.TRUE, Boolean.FALSE);
+        sexoUser.setSelectedItem(userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado()).isSexo());
         sexoUser.setItemCaptionGenerator(new ItemCaptionGenerator<Boolean>() {
 			private static final long serialVersionUID = 1L;
 			@Override
@@ -244,6 +250,7 @@ public class CuentaUsuarioVista extends HorizontalLayout implements View {
 					u.setSexo(sexoUser.getValue());
 					userDao.save(u);
 					Notification.show("Usuario modificado");
+					Page.getCurrent().reload();
 				} catch (ValidationException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -254,6 +261,89 @@ public class CuentaUsuarioVista extends HorizontalLayout implements View {
       	  }
       });
       vl.addComponent(Guardar);
+        
+		return vl;
+	}
+	
+	private Component modificarClave() {
+		VerticalLayout vl = new VerticalLayout();
+		passwordEncoder = new BCryptPasswordEncoder();
+		vl.setSizeFull();	
+		
+		Binder<User> binder = new Binder<>();
+		PasswordField claveAntigua = new PasswordField("Antigua contraseña");
+        claveAntigua.setValue("");
+        claveAntigua.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
+        claveAntigua.setIcon(FontAwesome.LOCK);
+        binder.forField(claveAntigua)
+        	.asRequired("Introduzca la contraseña antigua")
+        	.withValidator(clave -> passwordEncoder.matches(claveAntigua.getValue(), userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado()).getClave()), "La clave antigua no es correcta")
+        	.bind(User::getClave, User::setClave);
+
+        vl.addComponent(claveAntigua);
+
+        PasswordField claveNueva = new PasswordField("Nueva contraseña");   
+        claveNueva.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
+        claveNueva.setIcon(FontAwesome.LOCK);
+        binder.forField(claveNueva)
+        	.asRequired("Introduzca la nueva contraseña")
+        	.bind(User::getClave, User::setClave);
+        
+        vl.addComponent(claveNueva);
+        
+        PasswordField claveNueva1 = new PasswordField("Repita nueva contraseña");
+        claveNueva1.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
+        claveNueva1.setIcon(FontAwesome.LOCK);
+        binder.forField(claveNueva1)
+        	.asRequired("Introduzca la nueva contraseña")
+        	.withValidator(pass -> pass.equals(claveNueva.getValue()),"Las contraseñas no coinciden")
+        	.bind(User::getClave, User::setClave);
+      
+        vl.addComponent(claveNueva1);
+        
+        Button Guardar = new Button("Guardar", event -> {
+      	  if (binder.validate().isOk()) {
+      		  User u = userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado());
+      		  try {
+					binder.writeBean(u);
+					u.setClave(passwordEncoder.encode(claveNueva.getValue()));
+					userDao.save(u);
+					Notification.show("Usuario modificado");
+				} catch (ValidationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+      		  
+      	  }else {
+      		  claveNueva.setValue("");
+    		  claveNueva1.setValue("");
+      		  Notification.show("Revise los datos e intentelo de nuevo");
+      	  }
+      });
+      vl.addComponent(Guardar);
+        
+		return vl;
+	}
+	
+	private Component borrarCuenta() {
+		VerticalLayout vl = new VerticalLayout();
+		vl.setSizeFull();
+		
+		Binder<User> binder = new Binder<>();
+        
+        Button Eliminar = new Button("Eliminar", event -> {
+      		User u = userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado());
+      		//System.out.println("------------------->"+userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado()).getNombre());
+      		//userDao.delete(u);
+      		userDao.deleteById(userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado()).getId());
+			Notification.show("Usuario Eliminado");
+			
+			//cerramos sesion
+			getUI().getPage().reload();
+			getSession().close();
+      });
+      Eliminar.addStyleName(ValoTheme.BUTTON_DANGER);
+      vl.addComponent(Eliminar);
         
 		return vl;
 	}
@@ -277,9 +367,9 @@ public class CuentaUsuarioVista extends HorizontalLayout implements View {
 		Panel tab2 = new Panel();
 		tab2.setContent(modificarDatos());
 		tabs.addTab(tab2, "Modificar datos");
-		Panel tab3 = new Panel();
+		Panel tab3 = new Panel(modificarClave());
 		tabs.addTab(tab3, "Cambiar contraseña");
-		Panel tab4 = new Panel();
+		Panel tab4 = new Panel(borrarCuenta());
 		tabs.addTab(tab4, "Borrar cuenta");
 		addComponent(tabs);
 	}
