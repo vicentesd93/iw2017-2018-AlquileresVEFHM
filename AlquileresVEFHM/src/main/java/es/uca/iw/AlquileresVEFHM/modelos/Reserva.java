@@ -29,48 +29,72 @@ public class Reserva {
 	private User huesped;
 	@Column
 	private boolean aceptada;
+	@Column
+	private boolean rechazada;
 	@JoinColumn(name = "factura", nullable = true)
 	@OneToOne(fetch = FetchType.LAZY)
 	private Factura factura;
 	@OneToMany(mappedBy = "reserva", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<Oferta> ofertas;
+	private Set<ReservaOferta> reservasofertas;
 	
 	public Reserva() {}
-	public Reserva(@NotNull User huesped, boolean aceptada) {
-		super();
-		this.huesped = huesped;
-		this.aceptada = aceptada;
-	}
-	
+
 	public Integer getId() {
 		return id;
 	}
+
 	public User getHuesped() {
 		return huesped;
 	}
+
 	public boolean isAceptada() {
 		return aceptada;
 	}
+
+	public boolean isRechazada() {
+		return rechazada;
+	}
+
 	public Factura getFactura() {
 		return factura;
 	}
-	public Set<Oferta> getOfertas() {
-		return ofertas;
+
+	public Set<ReservaOferta> getReservasofertas() {
+		return reservasofertas;
 	}
-	
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
+
 	public void setHuesped(User huesped) {
 		this.huesped = huesped;
 	}
+
 	public void setAceptada(boolean aceptada) {
 		this.aceptada = aceptada;
 	}
+
+	public void setRechazada(boolean rechazada) {
+		this.rechazada = rechazada;
+	}
+
 	public void setFactura(Factura factura) {
 		this.factura = factura;
 	}
-	public void setOfertas(Set<Oferta> ofertas) {
-		this.ofertas = ofertas;
+
+	public void setReservasofertas(Set<ReservaOferta> reservasofertas) {
+		this.reservasofertas = reservasofertas;
+	}
+	
+	@Override
+	public boolean equals(Object object) {
+		if(object == null || object.getClass() != getClass()) return false;
+		return ((Reserva)object).getId() == id;
+	}
+
+	@Override
+	public int hashCode() {
+		return id;
 	}
 }

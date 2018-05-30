@@ -4,7 +4,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -41,9 +44,8 @@ public class Oferta {
 	@Column
 	@NotNull
 	private float penalizacion;
-	@JoinColumn(name = "reserva", nullable = true)
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Reserva reserva;
+	@OneToMany(mappedBy = "oferta", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private Set<ReservaOferta> reservasofertas;
 	
 	public Oferta() {}
 
@@ -67,8 +69,8 @@ public class Oferta {
 		return penalizacion;
 	}
 
-	public Reserva getReserva() {
-		return reserva;
+	public Set<ReservaOferta> getReservasofertas() {
+		return reservasofertas;
 	}
 
 	public void setId(Integer id) {
@@ -91,10 +93,10 @@ public class Oferta {
 		this.penalizacion = penalizacion;
 	}
 
-	public void setReserva(Reserva reserva) {
-		this.reserva = reserva;
+	public void setReservasofertas(Set<ReservaOferta> reservasofertas) {
+		this.reservasofertas = reservasofertas;
 	}
-	
+
 	public LocalDate getLDFecha() {
 		if(fecha == null) return null;
 		return Instant.ofEpochMilli(fecha.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();

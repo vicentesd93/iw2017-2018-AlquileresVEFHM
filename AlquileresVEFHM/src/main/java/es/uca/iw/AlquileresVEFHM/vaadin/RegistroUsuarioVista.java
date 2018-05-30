@@ -1,7 +1,5 @@
 package es.uca.iw.AlquileresVEFHM.vaadin;
 
-import java.time.LocalDate;
-
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;

@@ -9,6 +9,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+@SuppressWarnings("serial")
 @Component
 @UIScope
 public class AccesoDenegadoVista extends VerticalLayout implements View {

@@ -222,7 +222,11 @@ public class Apartamento {
 	public void setOfertas(Set<Oferta> ofertas) {
 		this.ofertas = ofertas;
 	}
-
+	
+	public String getDireccionCompleta() {
+		return direccion + ", " + poblacion + ", " + pais;
+	}
+	
 	@Override
 	public String toString() {
 		return "Apartamento [id=" + id + ", descripcion=" + descripcion + ", direccion="

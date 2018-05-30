@@ -1,14 +1,12 @@
 package es.uca.iw.AlquileresVEFHM.vaadin;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.navigator.View;
-import com.vaadin.server.BrowserWindowOpener;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
@@ -19,33 +17,25 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Layout;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 import es.uca.iw.AlquileresVEFHM.DAO.ApartamentoDAO;
-import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.Apartamento;
-import es.uca.iw.AlquileresVEFHM.modelos.User;
-import es.uca.iw.AlquileresVEFHM.seguridad.SeguridadUtil;
 
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "deprecation"})
 @SpringView(name = AnunciosMostrarVista.NOMBRE)
 public class AnunciosMostrarVista extends VerticalLayout implements View {
 	public static final String NOMBRE = "";
 	
 	private final ApartamentoDAO aparDao;
-	private final UserDAO userDao;
 	
 	private List<Apartamento> apartamentos;
 	private Integer anuncios = 3;
 	
 	@Autowired
-	public AnunciosMostrarVista(ApartamentoDAO ad, UserDAO ud) {
+	public AnunciosMostrarVista(ApartamentoDAO ad) {
 		aparDao = ad;
-		userDao = ud;
 	}
 	
 	@PostConstruct
@@ -95,6 +85,7 @@ public class AnunciosMostrarVista extends VerticalLayout implements View {
 			}
 		}
 		int paginas = (int) Math.ceil((float)apartamentos.size()/anuncios);
+		if(paginas == 0) paginas = 1;
 		HorizontalLayout nav = new HorizontalLayout();
 		if(pagina != 1) {
 			Button anterior = new Button();
@@ -141,7 +132,6 @@ public class AnunciosMostrarVista extends VerticalLayout implements View {
 				nav.addComponent(b);
 			}
 		}
-		System.out.println(pagina + " " + paginas);
 		if(pagina != paginas) {
 			Button siguiente = new Button();
 			siguiente.setIcon(FontAwesome.ARROW_RIGHT);
@@ -159,47 +149,4 @@ public class AnunciosMostrarVista extends VerticalLayout implements View {
 		vl.addComponent(nav);
 		vl.setComponentAlignment(nav, Alignment.MIDDLE_CENTER);
 	}
-	
-/*	private Window veranuncio(Apartamento apartamento) {
-		Window anuncio = new Window();
-		anuncio.setModal(true);
-		anuncio.setDraggable(false);
-		anuncio.setResizable(false);
-		anuncio.setWidth("70%");
-		anuncio.setHeight("70%");
-		VerticalLayout vl = new VerticalLayout();
-		GridLayout panfoto = new GridLayout();
-		panfoto.setWidth("50%");
-		
-		Image foto = new Image();
-		foto.setSource(apartamento.getFotos_apartamento().iterator().next().getStreamResource());
-		foto.setSizeFull();
-		panfoto.addComponent(foto);
-		panfoto.setComponentAlignment(foto, Alignment.MIDDLE_CENTER);
-		vl.addComponent(panfoto);
-		vl.setComponentAlignment(panfoto, Alignment.MIDDLE_CENTER);
-		
-		Label titulo = new Label("Descripción");
-		titulo.addStyleName(ValoTheme.LABEL_H3);
-		vl.addComponent(titulo);
-		
-		Label contenido = new Label(apartamento.getDescripcion());
-		vl.addComponent(contenido);
-		
-		vl.addComponent(new Label("Aqui iria los servicios"));
-		
-		if(!SeguridadUtil.isLoggedIn()) {
-		if(SeguridadUtil.getRol().equals("Huesped")) {
-			Button login = new Button("Inicie sesión como huesped para reservar");
-			login.addClickListener(new ClickListener() {
-
-				@Override
-				public void buttonClick(ClickEvent event) {					
-					getUI().getNavigator().navigateTo(LoginVista.NOMBRE);
-				}
-			});
-		}
-		anuncio.setContent(vl);
-		return anuncio;
-	}*/
 }
