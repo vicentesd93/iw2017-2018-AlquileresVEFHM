@@ -1,5 +1,6 @@
 package es.uca.iw.AlquileresVEFHM.vaadin;
 
+import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,15 +10,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.navigator.View;
 import com.vaadin.server.Page;
+import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
@@ -70,6 +74,11 @@ public class ReservaAnfitrionVista extends VerticalLayout implements View {
 								reservasaceptadas.add(ro.getReserva());
 						}
 					}
+					if(ro.getReserva().isAceptada()) {
+						if(!reservasaceptadas.contains(ro.getReserva())) {
+								reservasaceptadas.add(ro.getReserva());
+						}
+					}
 					if(ro.getReserva().isRechazada()) {
 						if(!reservasrechazadas.contains(ro.getReserva())) {
 							reservasrechazadas.add(ro.getReserva());
@@ -102,6 +111,72 @@ public class ReservaAnfitrionVista extends VerticalLayout implements View {
 			b.addClickListener(verofertas(reserva));
 			return b;
 		}).setCaption("Ofertas");
+		gridaceptadas.addComponentColumn(reserva -> {
+			if(reserva.getFactura() == null ) return new Label("Pendiente de pago");
+			Button b = new Button("Ver factura");
+			b.addStyleName(ValoTheme.BUTTON_BORDERLESS_COLORED);
+			b.addClickListener(new ClickListener() {
+				@Override
+				public void buttonClick(ClickEvent event) {
+					Window wpago = new Window();
+					wpago.setModal(true);
+					wpago.setDraggable(false);
+					wpago.setResizable(false);
+					
+					DecimalFormat df = new DecimalFormat();
+					df.setMaximumFractionDigits(2);
+					
+					FormLayout vl = new FormLayout();
+					vl.setMargin(true);
+					vl.setWidth(500.0f, Unit.PIXELS);
+					
+					Label titulo = new Label("Factura");
+					vl.addComponent(titulo);
+					
+					TextField metp = new TextField("Método pago");
+					metp.setValue(reserva.getFactura().getMetodo_pago().getDescripcion());
+					metp.setReadOnly(true);
+					vl.addComponent(metp);
+					
+					TextField mpval = new TextField();
+					mpval.setCaption(metp.getValue());
+					mpval.setValue(reserva.getFactura().getMpvalor());
+					mpval.setReadOnly(true);
+					vl.addComponent(mpval);
+					
+					TextField tot1 = new TextField("IVA (21%)");
+					tot1.setValue(df.format(reserva.getFactura().getIva()) + "€");
+					tot1.setReadOnly(true);
+					tot1.addStyleName(ValoTheme.TEXTFIELD_BORDERLESS);
+					vl.addComponent(tot1);
+					
+					TextField tot2 = new TextField("Cargo por metodo de pago (" + reserva.getFactura().getMetodo_pago().getCargo_adicional() + "%)");
+					tot2.setValue(df.format(reserva.getFactura().getComision()) + "€");
+					tot2.setReadOnly(true);
+					tot2.addStyleName(ValoTheme.TEXTFIELD_BORDERLESS);
+					vl.addComponent(tot2);
+					
+					TextField tot3 = new TextField("Total");
+					tot3.setValue(df.format(reserva.getFactura().getTotal()) + "€");
+					tot3.setReadOnly(true);
+					tot3.addStyleName(ValoTheme.TEXTFIELD_BORDERLESS);
+					vl.addComponent(tot3);
+
+					Button salir = new Button("Cerrar");
+					salir.addClickListener(new ClickListener() {
+						@Override
+						public void buttonClick(ClickEvent event) {
+							wpago.close();
+						}
+					});
+					vl.addComponent(salir);
+					wpago.setContent(vl);
+					getUI().addWindow(wpago);
+				}
+			});
+			return b;
+			
+		}).setCaption("Factura");
 		gridaceptadas.addComponentColumn(reserva -> new Label(reserva.getHuesped().getNombre()+" "+reserva.getHuesped().getApellidos())).setCaption("Nombre del huesped");
 		gridaceptadas.addComponentColumn(reserva -> new Label(reserva.getHuesped().getTelefono())).setCaption("Teléfono");
 		gridaceptadas.addComponentColumn(reserva -> new Label(reserva.getReservasofertas().iterator().next().getOferta().getApartamento().getDireccionCompleta())).setCaption("Apartamento");

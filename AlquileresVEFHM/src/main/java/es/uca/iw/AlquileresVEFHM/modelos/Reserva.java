@@ -97,4 +97,12 @@ public class Reserva {
 	public int hashCode() {
 		return id;
 	}
+	
+	public float getTotal() {
+		float total = 0;
+		for(ReservaOferta ro : getReservasofertas()) {
+			total += ro.getOferta().getPrecio();
+		}
+		return total;
+	}
 }

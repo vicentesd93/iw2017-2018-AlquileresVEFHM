@@ -31,6 +31,9 @@ public class Factura {
 	private float comision;
 	@Column
 	@NotNull
+	private String mpvalor;
+	@Column
+	@NotNull
 	private float total;
 	@OneToOne(mappedBy = "factura", cascade = CascadeType.ALL)
 	private Reserva reserva;
@@ -43,7 +46,6 @@ public class Factura {
 		this.comision = comision;
 		this.total = total;
 	}
-	
 	public Integer getId() {
 		return id;
 	}
@@ -56,13 +58,15 @@ public class Factura {
 	public float getComision() {
 		return comision;
 	}
+	public String getMpvalor() {
+		return mpvalor;
+	}
 	public float getTotal() {
 		return total;
 	}
 	public Reserva getReserva() {
 		return reserva;
 	}
-	
 	public void setId(Integer id) {
 		this.id = id;
 	}
@@ -75,10 +79,15 @@ public class Factura {
 	public void setComision(float comision) {
 		this.comision = comision;
 	}
+	public void setMpvalor(String mpvalor) {
+		this.mpvalor = mpvalor;
+	}
 	public void setTotal(float total) {
 		this.total = total;
 	}
 	public void setReserva(Reserva reserva) {
 		this.reserva = reserva;
 	}
+	
+	
 }

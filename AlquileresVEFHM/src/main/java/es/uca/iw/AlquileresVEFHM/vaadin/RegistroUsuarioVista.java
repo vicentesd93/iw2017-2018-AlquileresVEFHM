@@ -1,5 +1,7 @@
 package es.uca.iw.AlquileresVEFHM.vaadin;
 
+import java.time.LocalDate;
+
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,22 +13,25 @@ import com.vaadin.navigator.View;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.DateField;
+import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.ItemCaptionGenerator;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.RadioButtonGroup;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
 
 import es.uca.iw.AlquileresVEFHM.DAO.RolDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.User;
 import es.uca.iw.AlquileresVEFHM.seguridad.UserService;
 
+@SuppressWarnings("serial")
 @SpringView(name = RegistroUsuarioVista.NOMBRE)
 public class RegistroUsuarioVista extends VerticalLayout implements View {
-	private static final long serialVersionUID = 1L;
 	public static final String NOMBRE = "registro_usuario";
 	private UserDAO userDao;
 	private RolDAO rolDao;
@@ -43,15 +48,30 @@ public class RegistroUsuarioVista extends VerticalLayout implements View {
 	void init() {
 		setMargin(true);
         setSpacing(true);
+        
+        Label titulo = new Label("Añadir usuario");
+        titulo.addStyleName(ValoTheme.LABEL_HUGE);
+        addComponent(titulo);
 
         Binder<User> binder = new Binder<>();
+        
+        FormLayout form = new FormLayout();
+        form.setMargin(false);
+        addComponent(form);
+        
+        Label seccion = new Label("Datos inicio sesión");
+        seccion.addStyleName(ValoTheme.LABEL_H3);
+        seccion.addStyleName(ValoTheme.LABEL_COLORED);
+        form.addComponent(seccion);
+        
         
         TextField usuario = new TextField("Nombre usuario");
         binder.forField(usuario)
         	.asRequired("Introduzca un nombre de usuario")
         	.withValidator(login -> userDao.findByLogin(login) == null, "Ya existe un usuario con ese nombre")
         	.bind(User::getLogin, User::setLogin);
-        addComponent(usuario);
+        form.addComponent(usuario);
+        
 
         TextField email = new TextField("Correo electronico");
         binder.forField(email)
@@ -59,56 +79,62 @@ public class RegistroUsuarioVista extends VerticalLayout implements View {
         	.withValidator(new EmailValidator("Introduzca un correo electronico válido"))
         	.withValidator(mail -> userDao.findByEmail(mail) == null, "Ya existe un usuario con ese correo electronico.")
         	.bind(User::getEmail, User::setEmail);
-        addComponent(email);
+        form.addComponent(email);
         
         PasswordField clave = new PasswordField("Contraseña");
         binder.forField(clave)
         	.asRequired("Introduzca contraseña")
         	.bind(User::getClave, User::setClave);
-        addComponent(clave);
+        form.addComponent(clave);
         
         PasswordField clave1 = new PasswordField("Repita su contraseña");
         binder.forField(clave1)
         	.asRequired("Repita su contraseña")
         	.withValidator(pass -> pass.equals(clave.getValue()),"Las contraseñas no coinciden")
         	.bind(User::getClave, User::setClave);
-        addComponent(clave1);
+        form.addComponent(clave1);
+        
+        seccion = new Label("Datos personales");
+        seccion.addStyleName(ValoTheme.LABEL_H3);
+        seccion.addStyleName(ValoTheme.LABEL_COLORED);
+        form.addComponent(seccion);
         
         TextField dni = new TextField("DNI");
         binder.forField(dni)
         	.asRequired("Introduzca su DNI")
         	.bind(User::getDni, User::setDni);
-        addComponent(dni);
+        form.addComponent(dni);
         
         TextField nombre = new TextField("Nombre");
         binder.forField(nombre)
         	.asRequired("Introduzca su nombre")
         	.bind(User::getNombre, User::setNombre);
-        addComponent(nombre);
+        form.addComponent(nombre);
         
         TextField apellidos = new TextField("Apellidos");
         binder.forField(apellidos)
         	.asRequired("Introduzca sus apellidos")
         	.bind(User::getApellidos, User::setApellidos);
-        addComponent(apellidos);
+        form.addComponent(apellidos);
         
         DateField f_nacimiento = new DateField("Fecha de nacimiento");
+        f_nacimiento.setValue(LocalDate.now());
         binder.forField(f_nacimiento)
     	.asRequired("Introduzca su fecha de nacimiento")
     	.bind(User::getLDF_nacimiento, User::setLDF_nacimiento);
-        addComponent(f_nacimiento);
+        form.addComponent(f_nacimiento);
     
         TextField direccion = new TextField("Dirección");
         binder.forField(direccion)
         	.asRequired("Introduzca su dirección")
         	.bind(User::getDireccion, User::setDireccion);
-        addComponent(direccion);
+        form.addComponent(direccion);
         
         TextField telefono = new TextField("Teléfono");
         binder.forField(telefono)
         	.asRequired("Introduzca su telefono")
         	.bind(User::getTelefono, User::setTelefono);
-        addComponent(telefono);
+        form.addComponent(telefono);
         
         RadioButtonGroup<Boolean> sexo = new RadioButtonGroup<>("Sexo");
         sexo.setItems(Boolean.TRUE, Boolean.FALSE);
@@ -121,7 +147,14 @@ public class RegistroUsuarioVista extends VerticalLayout implements View {
         	}
         });
         binder.forField(sexo).bind(User::isSexo, User::setSexo);
-        addComponent(sexo);
+        sexo.addStyleName(ValoTheme.OPTIONGROUP_HORIZONTAL);
+        form.addComponent(sexo);
+        
+        
+        seccion = new Label("Tipo usuario");
+        seccion.addStyleName(ValoTheme.LABEL_H3);
+        seccion.addStyleName(ValoTheme.LABEL_COLORED);
+        form.addComponent(seccion);
         
         NativeSelect<Integer> rol = new NativeSelect<>("Tipo usuario");
         rol.setItems(1,2);
@@ -139,7 +172,7 @@ public class RegistroUsuarioVista extends VerticalLayout implements View {
         });
         rol.setValue(1);
         rol.setEmptySelectionAllowed(false);
-        addComponent(rol);
+        form.addComponent(rol);
         
         Button ResistrarBoton = new Button("Registrar", event -> {
         	  if (binder.validate().isOk()) {
@@ -160,6 +193,6 @@ public class RegistroUsuarioVista extends VerticalLayout implements View {
         		  Notification.show("Revise los datos e intentelo de nuevo");
         	  }
         });
-        addComponent(ResistrarBoton);
+        form.addComponent(ResistrarBoton);
 	}
 }

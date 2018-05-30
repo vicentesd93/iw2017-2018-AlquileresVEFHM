@@ -61,4 +61,9 @@ public class Metodo_pago {
 	public void setFacturas(Set<Factura> facturas) {
 		this.facturas = facturas;
 	}
+	@Override
+	public String toString() {
+		return descripcion;
+	}
+	
 }

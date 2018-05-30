@@ -17,8 +17,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import es.uca.iw.AlquileresVEFHM.DAO.Metodo_pagoDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.RolDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.Tipo_apartamentoDAO;
+import es.uca.iw.AlquileresVEFHM.modelos.Metodo_pago;
 import es.uca.iw.AlquileresVEFHM.modelos.Rol;
 import es.uca.iw.AlquileresVEFHM.modelos.Tipo_apartamento;
 import es.uca.iw.AlquileresVEFHM.seguridad.VaadinSessionSecurityContextHolderStrategy;
@@ -30,7 +32,7 @@ public class AlquileresVefhmApplication {
 	}
 	
 	@Bean
-	public CommandLineRunner loadData(RolDAO rolDao, Tipo_apartamentoDAO t_aparDao) {
+	public CommandLineRunner loadData(RolDAO rolDao, Tipo_apartamentoDAO t_aparDao, Metodo_pagoDAO m_pagoDao) {
 	    return (args) -> {
 	    	if(!rolDao.findAll().iterator().hasNext()) {
 	    		rolDao.save(new Rol("Huesped"));
@@ -42,6 +44,11 @@ public class AlquileresVefhmApplication {
 	    		t_aparDao.save(new Tipo_apartamento("Chalet"));
 	    		t_aparDao.save(new Tipo_apartamento("Solar"));
 	    		t_aparDao.save(new Tipo_apartamento("Otro"));
+	    	}
+	    	if(!m_pagoDao.findAll().iterator().hasNext()) {
+	    		m_pagoDao.save(new Metodo_pago("Tarjeta", 4));
+	    		m_pagoDao.save(new Metodo_pago("Transferencia", 0));
+	    		m_pagoDao.save(new Metodo_pago("PayPal", 10));
 	    	}
 	    };
 	}
