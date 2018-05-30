@@ -153,8 +153,6 @@ public class AlquileresVefhmApplicationTests {
 		 Metodo_pago mpagoGuardado = metodoPagoDao.save(mpago);
 		 assertNotNull(mpagoGuardado);
 		 assertEquals(mpagoGuardado.getDescripcion(), mpago.getDescripcion());
-
-		 
 	 }
 
 }
