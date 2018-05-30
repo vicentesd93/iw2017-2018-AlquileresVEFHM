@@ -10,6 +10,7 @@ import com.vaadin.data.Binder;
 import com.vaadin.data.ValidationException;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.navigator.View;
+import com.vaadin.server.Page;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.DateField;
@@ -29,7 +30,7 @@ import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.User;
 import es.uca.iw.AlquileresVEFHM.seguridad.UserService;
 
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "deprecation"})
 @SpringView(name = RegistroUsuarioVista.NOMBRE)
 public class RegistroUsuarioVista extends VerticalLayout implements View {
 	public static final String NOMBRE = "registro_usuario";
@@ -181,12 +182,11 @@ public class RegistroUsuarioVista extends VerticalLayout implements View {
 					binder.writeBean(u);
 					u.setRol(rolDao.findById(rol.getValue()).get());
 					us.save(u);
-					Notification.show("Usuario registrado");
+					Notification.show("Usuario registrado", Notification.TYPE_WARNING_MESSAGE);
+					Page.getCurrent().open("/#!login", null);
 				} catch (ValidationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					Notification.show("Revise los datos e intentelo de nuevo");
 				}
-        		  
         	  }else {
         		  clave.setValue("");
         		  clave1.setValue("");

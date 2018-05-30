@@ -1,12 +1,15 @@
 package es.uca.iw.AlquileresVEFHM.vaadin;
 
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
+import javax.sql.rowset.serial.SerialBlob;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,27 +19,32 @@ import com.vaadin.event.selection.SelectionEvent;
 import com.vaadin.event.selection.SelectionListener;
 import com.vaadin.navigator.View;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Page;
+import com.vaadin.server.Page.Styles;
+import com.vaadin.server.StreamVariable;
 import com.vaadin.server.UserError;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Html5File;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.components.grid.EditorSaveEvent;
 import com.vaadin.ui.components.grid.EditorSaveListener;
+import com.vaadin.ui.dnd.FileDropTarget;
 import com.vaadin.ui.themes.ValoTheme;
 
 import es.uca.iw.AlquileresVEFHM.DAO.ApartamentoDAO;
@@ -50,7 +58,7 @@ import es.uca.iw.AlquileresVEFHM.modelos.User;
 import es.uca.iw.AlquileresVEFHM.seguridad.SeguridadUtil;
 
 @SpringView(name = ApartamentosVista.NOMBRE)
-@SuppressWarnings({"serial","deprecation"})
+@SuppressWarnings({"serial","deprecation", "unused"})
 public class ApartamentosVista extends VerticalLayout implements View {
 	public static final String NOMBRE = "apartamentos";
 	private User usuario;
@@ -62,6 +70,7 @@ public class ApartamentosVista extends VerticalLayout implements View {
 	private Integer windowfotoindice = 0;
 	private Apartamento apartamento;
 	private Set<Oferta> ofertas;
+	private Foto_apartamento foto_apartamento;
 	
 	@Autowired
 	public ApartamentosVista(UserDAO ud, ApartamentoDAO ad, Foto_apartamentoDAO fd, OfertaDAO od) {
@@ -73,6 +82,12 @@ public class ApartamentosVista extends VerticalLayout implements View {
 
 	@PostConstruct
 	void init() {
+		if(!SeguridadUtil.isLoggedIn() || SeguridadUtil.isLoggedIn() && !SeguridadUtil.getRol().equals("Anfitrion")) {
+			Notification.show("No tiene permisos para acceder a la página", Notification.TYPE_ERROR_MESSAGE);
+			Page.getCurrent().open("/#!login", null);
+			return;
+		}
+		
 		usuario = userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado());
 		
 		setWidth("100%");
@@ -82,6 +97,8 @@ public class ApartamentosVista extends VerticalLayout implements View {
 		Label titulo = new Label("Mis apartamentos");
 		titulo.addStyleName(ValoTheme.LABEL_HUGE);
 		addComponent(titulo);
+		
+		addComponent(new Label("Para editar el apartamento haga 2 clicks en el mismo"));
 		
 		TextField Edescripcion = new TextField();
 		TextField Edireccion = new TextField();
@@ -246,16 +263,10 @@ public class ApartamentosVista extends VerticalLayout implements View {
 			}
 		}));
 		
-		opciones.addComponent(crearBotonOpcion("Reservas", new ClickListener() {
-			@Override
-			public void buttonClick(ClickEvent event) {
-					Notification.show("Reservas");
-			}
-		}));
-		
 		opciones.addComponent(crearBotonOpcion("Imágenes", new ClickListener() {
 			@Override
 			public void buttonClick(ClickEvent event) {
+				apartamento = grid.asSingleSelect().getOptionalValue().get();
 				windowfotoindice = 0;
 				Window ventana = new Window("Imágenes");
 				ventana.setWidth("80%");
@@ -272,7 +283,7 @@ public class ApartamentosVista extends VerticalLayout implements View {
 				List<Foto_apartamento> fotos = new ArrayList<>();
 				
 				fotos.addAll(grid.asSingleSelect().getOptionalValue().get().getFotos_apartamento());
-				Foto_apartamento foto_apartamento = fotos.get(windowfotoindice);
+				foto_apartamento = fotos.get(windowfotoindice);
 				
 				Image foto = new Image();
 				foto.setSource(foto_apartamento.getStreamResource());
@@ -308,7 +319,8 @@ public class ApartamentosVista extends VerticalLayout implements View {
 						if(windowfotoindice <= 0) windowfotoindice = fotos.size() - 1;
 						else --windowfotoindice;
 						ind.setValue(String.valueOf(windowfotoindice + 1) + "/" + String.valueOf(fotos.size()));
-						foto.setSource(fotos.get(windowfotoindice).getStreamResource());
+						foto_apartamento = fotos.get(windowfotoindice);
+						foto.setSource(foto_apartamento.getStreamResource());
 					}
 				});
 				
@@ -318,21 +330,136 @@ public class ApartamentosVista extends VerticalLayout implements View {
 						if(windowfotoindice >= fotos.size() - 1) windowfotoindice = 0;
 						else ++windowfotoindice;
 						ind.setValue(String.valueOf(windowfotoindice + 1) + "/" + String.valueOf(fotos.size()));
-						foto.setSource(fotos.get(windowfotoindice).getStreamResource());
+						foto_apartamento = fotos.get(windowfotoindice);
+						foto.setSource(foto_apartamento.getStreamResource());
 					}
 				});
 				
 				opc.addComponent(crearBotonOpcion("Añadir Imagen", new ClickListener() {
 					@Override
-					public void buttonClick(ClickEvent event) {
-
+					public void buttonClick(ClickEvent e) {
+						Window nueva = new Window();
+						nueva.setModal(true);
+						nueva.setResizable(false);
+						nueva.setDraggable(false);
 						
+						FormLayout form = new FormLayout();
+						nueva.setContent(form);
+						
+						Label dropArea = new Label("Arrastra las fotos hasta aqui");
+				        Styles estilo = Page.getCurrent().getStyles();
+				        estilo.add(".drop-area {border-radius: 69px 69px 69px 69px;" + 
+				        		"-moz-border-radius: 69px 69px 69px 69px;" + 
+				        		"-webkit-border-radius: 69px 69px 69px 69px;" + 
+				        		"border: 9px dashed #adadad;}");
+				        dropArea.addStyleName("drop-area");
+				        
+				        Label img_label = new Label();
+				        form.addComponent(dropArea);
+				        
+				        ProgressBar progress = new ProgressBar();
+				        progress.setIndeterminate(true);
+				        progress.setVisible(false);
+				        form.addComponent(progress);
+				        form.addComponent(img_label);
+				        
+				        ArrayList<Html5File> imagenes = new ArrayList<Html5File>();
+				        FileDropTarget<Label> dropTarget = new FileDropTarget<>(dropArea, event -> {
+				            Collection<Html5File> files = event.getFiles();
+				            files.forEach(file -> {
+				            	if(file.getFileSize() <= 5 * 1024 * 1024) {
+				            		if(file.getType().split("/")[0].equals("image")) {
+					            		if(imagenes.isEmpty()) img_label.setValue(file.getFileName());
+					            		else img_label.setValue(img_label.getValue() + ", " + file.getFileName());
+					            		imagenes.add(file);
+					            		final ByteArrayOutputStream bas = new ByteArrayOutputStream();
+					                    final StreamVariable streamVariable = new StreamVariable() {
+					
+					                         @Override
+					                         public ByteArrayOutputStream getOutputStream() {
+					                              return bas;
+					                         }
+					
+					                         @Override
+					                         public boolean listenProgress() {
+					                              return false;
+					                         }
+					
+					                         @Override
+					                         public void onProgress(
+					                              final StreamingProgressEvent event) {
+					                         }
+					
+					                         @Override
+					                         public void streamingStarted(
+					                              final StreamingStartEvent event) {
+					                         }
+					
+					                         @Override
+					                         public void streamingFinished(
+					                              final StreamingEndEvent event) {
+					                              progress.setVisible(false);
+					                         }
+					
+					                         @Override
+					                         public void streamingFailed(
+					                              final StreamingErrorEvent event) {
+					                              progress.setVisible(false);
+					                         }
+					
+					                         @Override
+					                         public boolean isInterrupted() {
+					                              return false;
+					                         }
+					                     };
+					                     file.setStreamVariable(streamVariable);
+					                     progress.setVisible(true);
+				            		}else {
+				            			Notification.show("El archivo " + file.getFileName() + " no es una imagen", Notification.TYPE_ERROR_MESSAGE);
+				            		}
+				                }else {
+				            		Notification.show("Tamaño maximo de imagen 5MB", Notification.TYPE_ERROR_MESSAGE);
+				            	}
+				            });
+				        });
+				        
+				        Button anadir = new Button("Añadir", event -> {
+				        	if(imagenes.size() < 1) {
+				        		Notification.show("No hay imágenes que añadir", Notification.TYPE_ERROR_MESSAGE);
+				        	}else {
+				        		try {			        		
+									for(Html5File f: imagenes) {
+										ByteArrayOutputStream baos = (ByteArrayOutputStream) f.getStreamVariable().getOutputStream();
+										Foto_apartamento fa = new Foto_apartamento();
+										fa.setFoto(new SerialBlob(baos.toByteArray()));
+										fa.setNombre(f.getFileName());
+										fa.setApartamento(apartamento);
+										faDao.save(fa);
+										fotos.add(fa);
+									}
+									windowfotoindice = 0;
+									foto_apartamento = fotos.get(windowfotoindice);
+									foto.setSource(foto_apartamento.getStreamResource());
+									ind.setValue(String.valueOf(windowfotoindice + 1 + "/" + String.valueOf(fotos.size())));
+									Notification.show("Imágenes añadidas correctamente", Notification.TYPE_WARNING_MESSAGE);
+									nueva.close();
+								} catch (Exception exc) {
+					        		Notification.show("Ha ocurrido un error intentelo de nuevo", Notification.TYPE_ERROR_MESSAGE);
+								}
+				        	}
+				        });
+				        form.addComponent(anadir);
+				        getUI().addWindow(nueva);
 					}
 				}));
 				opc.addComponent(crearBotonOpcion("Eliminar imagen", new ClickListener() {
 					@Override
 					public void buttonClick(ClickEvent event) {
 						Window eliminar = new Window("Eliminar imagen");
+						if(fotos.size() <= 1) {
+							Notification.show("El apartamento debe contener al menos 1 imagen", Notification.TYPE_ERROR_MESSAGE);
+							return;
+						}
 						eliminar.setWidth(100.0f, Unit.PIXELS);
 						eliminar.setModal(true);
 						eliminar.setResizable(false);
@@ -352,10 +479,13 @@ public class ApartamentosVista extends VerticalLayout implements View {
 						hl.setWidth("100%");
 						Button si = new Button("Si", new ClickListener() {
 							@Override
-							public void buttonClick(ClickEvent event) {
+							public void buttonClick(ClickEvent e) {
 								faDao.delete(foto_apartamento);
 								fotos.remove(foto_apartamento);
-								ind.setValue(String.valueOf(windowfotoindice + 1) + "/" + String.valueOf(fotos.size()));
+								windowfotoindice = 0;
+								foto_apartamento = fotos.get(windowfotoindice);
+								foto.setSource(foto_apartamento.getStreamResource());
+								ind.setValue(String.valueOf(windowfotoindice + 1 + "/" + String.valueOf(fotos.size())));
 								eliminar.close();
 								ventana.close();
 								getUI().getUI().addWindow(ventana);

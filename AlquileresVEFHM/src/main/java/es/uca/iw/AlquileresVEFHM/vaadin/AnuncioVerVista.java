@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
+import com.vaadin.server.Page;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -37,6 +38,7 @@ public class AnuncioVerVista extends VerticalLayout implements View {
 	@Override
 	public void enter(ViewChangeListener.ViewChangeEvent e) {
 		apartamento = aparDao.findById(Integer.parseInt(e.getParameters())).get();
+		if(apartamento == null) Page.getCurrent().reload();
 		GridLayout panfoto = new GridLayout();
 		panfoto.setWidth("70%");
 		

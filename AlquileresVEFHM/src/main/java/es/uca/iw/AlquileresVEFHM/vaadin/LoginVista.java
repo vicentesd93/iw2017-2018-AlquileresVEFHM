@@ -61,13 +61,9 @@ public class LoginVista extends VerticalLayout implements View{
 		try {
 			Authentication token = authenticationManager
 					.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-			// Reinitialize the session to protect against session fixation
-			// attacks. This does not work with websocket communication.
 			VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
 			SecurityContextHolder.getContext().setAuthentication(token);
 			Page.getCurrent().reload();
-			// Show the main UI
-			//showIndexVista();
 			return true;
 		} catch (AuthenticationException ex) {
 			return false;

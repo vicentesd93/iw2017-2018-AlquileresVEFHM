@@ -66,7 +66,11 @@ public class ReservaVista extends VerticalLayout implements View {
 	
 	@PostConstruct
 	void init() {
-		if(!SeguridadUtil.isLoggedIn() || !SeguridadUtil.getRol().equals("Huesped")) Page.getCurrent().reload();
+		if(!SeguridadUtil.isLoggedIn() || SeguridadUtil.isLoggedIn() && !SeguridadUtil.getRol().equals("Huesped")) {
+			Notification.show("No tiene permisos para acceder a la página", Notification.TYPE_ERROR_MESSAGE);
+			Page.getCurrent().open("/#!login", null);
+			return;
+		}
 		setSizeFull();
 	}
 	
@@ -176,7 +180,7 @@ public class ReservaVista extends VerticalLayout implements View {
 			oferta.setLDFecha(fecha.minusYears(1));
 		}
 		
-		Panel calendario = new Panel(inicio.getMonth().getDisplayName(TextStyle.FULL, Locale.getDefault()));
+		Panel calendario = new Panel(inicio.getMonth().getDisplayName(TextStyle.FULL, Locale.getDefault()) + " - " + inicio.getYear());
 		
 		VerticalLayout vl = new VerticalLayout();
 		int diasem = 1;

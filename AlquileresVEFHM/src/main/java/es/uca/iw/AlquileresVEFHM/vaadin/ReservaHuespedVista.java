@@ -261,24 +261,26 @@ public class ReservaHuespedVista extends VerticalLayout implements View {
 					pagar.addClickListener(new ClickListener() {
 						@Override
 						public void buttonClick(ClickEvent event) {
-							Factura f = new Factura();
-							try {
-								binder.writeBean(f);
-								f.setIva(reserva.getTotal() * 0.21f);
-								f.setComision(reserva.getTotal() * metp.getValue().getCargo_adicional() / 100);
-								f.setTotal(reserva.getTotal() * (1.21f + metp.getValue().getCargo_adicional() / 100));
-								facturaDao.save(f);
-								reserva.setFactura(f);
-								reservaDao.save(reserva);
-								Notification.show("Factura generada", Notification.TYPE_WARNING_MESSAGE);
-								wpago.close();
-								removeAllComponents();
-								init();
-							} catch (ValidationException e) {
-								Notification.show("Error al generar factura", Notification.TYPE_ERROR_MESSAGE);
-								wpago.close();
-								removeAllComponents();
-								init();
+							if(binder.isValid()) {
+								Factura f = new Factura();
+								try {
+									binder.writeBean(f);
+									f.setIva(reserva.getTotal() * 0.21f);
+									f.setComision(reserva.getTotal() * metp.getValue().getCargo_adicional() / 100);
+									f.setTotal(reserva.getTotal() * (1.21f + metp.getValue().getCargo_adicional() / 100));
+									facturaDao.save(f);
+									reserva.setFactura(f);
+									reservaDao.save(reserva);
+									Notification.show("Factura generada", Notification.TYPE_WARNING_MESSAGE);
+									wpago.close();
+									removeAllComponents();
+									init();
+								} catch (ValidationException e) {
+									Notification.show("Error al generar factura", Notification.TYPE_ERROR_MESSAGE);
+									wpago.close();
+									removeAllComponents();
+									init();
+								}
 							}
 						}
 					});

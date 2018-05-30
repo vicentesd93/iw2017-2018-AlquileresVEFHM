@@ -1,7 +1,6 @@
 package es.uca.iw.AlquileresVEFHM.vaadin;
 
 import java.io.ByteArrayOutputStream;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -9,12 +8,10 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.sql.rowset.serial.SerialBlob;
-import javax.sql.rowset.serial.SerialException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.data.Binder;
-import com.vaadin.data.ValidationException;
 import com.vaadin.navigator.View;
 import com.vaadin.server.Page;
 import com.vaadin.server.Page.Styles;
@@ -44,7 +41,7 @@ import es.uca.iw.AlquileresVEFHM.modelos.User;
 import es.uca.iw.AlquileresVEFHM.seguridad.SeguridadUtil;
 
 
-@SuppressWarnings({"serial", "deprecation"})
+@SuppressWarnings({"serial", "deprecation", "unused"})
 @SpringView(name = ApartamentoRegistroVista.NOMBRE)
 public class ApartamentoRegistroVista extends VerticalLayout implements View {
 	public static final String NOMBRE = "registro_apartamento";
@@ -216,50 +213,55 @@ public class ApartamentoRegistroVista extends VerticalLayout implements View {
             Collection<Html5File> files = event.getFiles();
             files.forEach(file -> {
             	if(file.getFileSize() <= 5 * 1024 * 1024) {
-            		imagenes.add(file);
-            		img_label.setValue(img_label.getValue() + ", " + file.getFileName());
-            		final ByteArrayOutputStream bas = new ByteArrayOutputStream();
-                    final StreamVariable streamVariable = new StreamVariable() {
-
-                         @Override
-                         public ByteArrayOutputStream getOutputStream() {
-                              return bas;
-                         }
-
-                         @Override
-                         public boolean listenProgress() {
-                              return false;
-                         }
-
-                         @Override
-                         public void onProgress(
-                              final StreamingProgressEvent event) {
-                         }
-
-                         @Override
-                         public void streamingStarted(
-                              final StreamingStartEvent event) {
-                         }
-
-                         @Override
-                         public void streamingFinished(
-                              final StreamingEndEvent event) {
-                              progress.setVisible(false);
-                         }
-
-                         @Override
-                         public void streamingFailed(
-                              final StreamingErrorEvent event) {
-                              progress.setVisible(false);
-                         }
-
-                         @Override
-                         public boolean isInterrupted() {
-                              return false;
-                         }
-                     };
-                     file.setStreamVariable(streamVariable);
-                     progress.setVisible(true);
+            		if(file.getType().split("/")[0].equals("image")) {
+	            		if(imagenes.isEmpty()) img_label.setValue(file.getFileName());
+	            		else img_label.setValue(img_label.getValue() + ", " + file.getFileName());
+	            		imagenes.add(file);
+	            		final ByteArrayOutputStream bas = new ByteArrayOutputStream();
+	                    final StreamVariable streamVariable = new StreamVariable() {
+	
+	                         @Override
+	                         public ByteArrayOutputStream getOutputStream() {
+	                              return bas;
+	                         }
+	
+	                         @Override
+	                         public boolean listenProgress() {
+	                              return false;
+	                         }
+	
+	                         @Override
+	                         public void onProgress(
+	                              final StreamingProgressEvent event) {
+	                         }
+	
+	                         @Override
+	                         public void streamingStarted(
+	                              final StreamingStartEvent event) {
+	                         }
+	
+	                         @Override
+	                         public void streamingFinished(
+	                              final StreamingEndEvent event) {
+	                              progress.setVisible(false);
+	                         }
+	
+	                         @Override
+	                         public void streamingFailed(
+	                              final StreamingErrorEvent event) {
+	                              progress.setVisible(false);
+	                         }
+	
+	                         @Override
+	                         public boolean isInterrupted() {
+	                              return false;
+	                         }
+	                     };
+	                     file.setStreamVariable(streamVariable);
+	                     progress.setVisible(true);
+            		}else {
+            			Notification.show("El archivo " + file.getFileName() + " no es una imagen", Notification.TYPE_ERROR_MESSAGE);
+            		}
                 }else {
             		Notification.show("Tamaño maximo de imagen 5MB", Notification.TYPE_ERROR_MESSAGE);
             	}
@@ -267,7 +269,10 @@ public class ApartamentoRegistroVista extends VerticalLayout implements View {
         });
         
         Button registrar = new Button("Registrar", event -> {
-        	if(binder.validate().isOk()) {
+        	if(imagenes.size() < 1) {
+        		Notification.show("El apartamento debe tener al menos 1 foto", Notification.TYPE_ERROR_MESSAGE);
+        		binder.validate();
+        	}else if(binder.validate().isOk()) {
         		Apartamento a = new Apartamento();
         		Set<Foto_apartamento> fotos = new HashSet<Foto_apartamento>();
         		try {
@@ -283,15 +288,8 @@ public class ApartamentoRegistroVista extends VerticalLayout implements View {
 					}
 					a.setFotos_apartamento(fotos);
 					aparDao.save(a);
-				} catch (ValidationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (SerialException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				} catch (Exception e) {
+	        		Notification.show("Ha ocurrido un error intentelo de nuevo", Notification.TYPE_ERROR_MESSAGE);
 				}
         	}
         });
