@@ -93,7 +93,6 @@ public class AlquileresVefhmApplicationTests {
 		 apartamento.setPiscina(true);
 		 apartamento.setPoblacion("jerez");
 		 apartamento.setTrastero(true);
-		 
 		 apartamento.setAnfitrion(anfitrion);
 		
 		 tipoApDAO.save(tipoApart);
