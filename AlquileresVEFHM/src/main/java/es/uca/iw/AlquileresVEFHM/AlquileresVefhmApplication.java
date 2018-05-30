@@ -1,5 +1,7 @@
 package es.uca.iw.AlquileresVEFHM;
 
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -20,9 +22,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import es.uca.iw.AlquileresVEFHM.DAO.Metodo_pagoDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.RolDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.Tipo_apartamentoDAO;
+import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.Metodo_pago;
 import es.uca.iw.AlquileresVEFHM.modelos.Rol;
 import es.uca.iw.AlquileresVEFHM.modelos.Tipo_apartamento;
+import es.uca.iw.AlquileresVEFHM.modelos.User;
+import es.uca.iw.AlquileresVEFHM.seguridad.UserService;
 import es.uca.iw.AlquileresVEFHM.seguridad.VaadinSessionSecurityContextHolderStrategy;
 
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
@@ -32,7 +37,7 @@ public class AlquileresVefhmApplication {
 	}
 	
 	@Bean
-	public CommandLineRunner loadData(RolDAO rolDao, Tipo_apartamentoDAO t_aparDao, Metodo_pagoDAO m_pagoDao) {
+	public CommandLineRunner loadData(RolDAO rolDao, Tipo_apartamentoDAO t_aparDao, Metodo_pagoDAO m_pagoDao, UserDAO userDao, UserService userService) {
 	    return (args) -> {
 	    	if(!rolDao.findAll().iterator().hasNext()) {
 	    		rolDao.save(new Rol("Huesped"));
@@ -49,6 +54,10 @@ public class AlquileresVefhmApplication {
 	    		m_pagoDao.save(new Metodo_pago("Tarjeta", 4));
 	    		m_pagoDao.save(new Metodo_pago("Transferencia", 0));
 	    		m_pagoDao.save(new Metodo_pago("PayPal", 10));
+	    	}
+	    	if(userDao.findByLogin("admin") == null) {
+	    		User u = new User("admin", "admin", "admin@mail.com", "1234", "admin", "admin", new Date(), true, "Direccion", "8237232",rolDao.findAll().iterator().next(), null, false);
+	    		userService.save(u);
 	    	}
 	    };
 	}
