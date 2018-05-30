@@ -36,9 +36,9 @@ import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.User;
 import es.uca.iw.AlquileresVEFHM.seguridad.SeguridadUtil;
 
-@SuppressWarnings({"serial", "deprecation"})
 @SpringView(name = CuentaUsuarioVista.NOMBRE)
 public class CuentaUsuarioVista extends HorizontalLayout implements View {
+	private static final long serialVersionUID = 1L;
 	public final static String NOMBRE = "cuenta_usuario";
 	private User usuario;
 	private UserDAO userDao;
@@ -327,8 +327,11 @@ public class CuentaUsuarioVista extends HorizontalLayout implements View {
 	private Component borrarCuenta() {
 		VerticalLayout vl = new VerticalLayout();
 		vl.setSizeFull();
-		        
+		
+		Binder<User> binder = new Binder<>();
+        
         Button Eliminar = new Button("Eliminar", event -> {
+      		User u = userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado());
       		//System.out.println("------------------->"+userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado()).getNombre());
       		//userDao.delete(u);
       		userDao.deleteById(userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado()).getId());
@@ -351,6 +354,11 @@ public class CuentaUsuarioVista extends HorizontalLayout implements View {
 	
 	@PostConstruct
 	void init() {
+		if(!SeguridadUtil.isLoggedIn()) {
+			Notification.show("No tiene permisos para acceder a la página", Notification.TYPE_ERROR_MESSAGE);
+			Page.getCurrent().open("/#!login", null);
+			return;
+		}
 		usuario = userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado());
 
 		setSizeFull();
