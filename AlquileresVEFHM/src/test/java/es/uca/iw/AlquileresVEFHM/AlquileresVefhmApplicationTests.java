@@ -1,5 +1,6 @@
 package es.uca.iw.AlquileresVEFHM;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.Date;
@@ -12,10 +13,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import es.uca.iw.AlquileresVEFHM.DAO.ApartamentoDAO;
+import es.uca.iw.AlquileresVEFHM.DAO.Metodo_pagoDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.RolDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.Tipo_apartamentoDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.Apartamento;
+import es.uca.iw.AlquileresVEFHM.modelos.Metodo_pago;
 import es.uca.iw.AlquileresVEFHM.modelos.Rol;
 import es.uca.iw.AlquileresVEFHM.modelos.Tipo_apartamento;
 import es.uca.iw.AlquileresVEFHM.modelos.User;
@@ -32,6 +35,8 @@ public class AlquileresVefhmApplicationTests {
 	private RolDAO rolDao;
 	@Autowired
 	private Tipo_apartamentoDAO tipoApDAO;
+	@Autowired
+	private Metodo_pagoDAO metodoPagoDao;
 	
 	@Test
 	public void contextLoads() {
@@ -55,6 +60,34 @@ public class AlquileresVefhmApplicationTests {
 		 
 	     assertNotNull(usuario);
 	 }
+	 
+	 @Test
+	 public void crearUsuariosConParametros()
+	 {
+		 String clave = "clave";
+		 String direccion = "direccion";
+		 String dni = "dni";
+		 String email = "emailPrueba@correo.com";
+		 String login = "logindepruebasusuario";
+		 String nombre = "nombre";
+		 String apellidos = "apellidos";
+		 String telefono = "777777777";
+		 Date fech_nac = new Date();
+		 Date fech_reg = new Date();
+		 boolean sex= true;
+		 Rol rol = rolDao.findById(rolDao.findByNombre("Anfitrion").getId()).get();
+		 boolean activo = true;
+		 
+		 User user = new User(login, clave, email, dni, nombre, apellidos,fech_nac, sex, direccion, telefono,rol, fech_reg, activo);
+		User usuarioCreado = userdao.save(user);
+		 
+		 
+		 assertNotNull(user);
+		 assertEquals(usuarioCreado.getEmail(), user.getEmail());
+		 assertEquals(usuarioCreado.getDni(), user.getDni());
+		 assertEquals(usuarioCreado.getRol(), user.getRol());
+	 }
+	 
 	 
 	 @Test 
 	 public void añadirApartamento() {
@@ -100,6 +133,28 @@ public class AlquileresVefhmApplicationTests {
 		 apartDao.save(apartamento);
 		 userdao.save(anfitrion);
 		 assertNotNull(userdao.findById(anfitrion.getId()).get().getApartamentos());
+	 }
+	 
+	 @Test
+	 public void buscarRol() {
+
+		 String nombreRol = "Anfitrion";
+		assertNotNull(rolDao.findById(rolDao.findByNombre(nombreRol).getId()));
+		assertEquals(nombreRol, rolDao.findByNombre(nombreRol).getNombre());
+		 
+	 }
+	 
+	 @Test
+	 public void crearMetododoPago() {
+		 String descripcion = "metodopago";
+		 float cargo = 2.2f;
+		 Metodo_pago mpago = new Metodo_pago(descripcion,cargo);
+		 
+		 Metodo_pago mpagoGuardado = metodoPagoDao.save(mpago);
+		 assertNotNull(mpagoGuardado);
+		 assertEquals(mpagoGuardado.getDescripcion(), mpago.getDescripcion());
+
+		 
 	 }
 
 }
