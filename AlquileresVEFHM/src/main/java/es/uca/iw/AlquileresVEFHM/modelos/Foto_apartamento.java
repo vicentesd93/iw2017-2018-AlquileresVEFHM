@@ -76,6 +76,7 @@ public class Foto_apartamento {
 		this.foto = foto;
 	}
 	
+	@SuppressWarnings("serial")
 	public StreamResource getStreamResource() {
 		return new StreamResource(new StreamSource() {
 			@Override

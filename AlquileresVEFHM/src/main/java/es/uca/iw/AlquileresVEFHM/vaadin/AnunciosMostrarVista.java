@@ -17,6 +17,7 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -42,6 +43,9 @@ public class AnunciosMostrarVista extends VerticalLayout implements View {
 	void init() {
 		apartamentos = aparDao.apartamentosOfertados();
 		
+		setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
+		setMargin(true);
+		
 		setWidth("100%");
 		mostrar(1, this);
 	}
@@ -53,8 +57,8 @@ public class AnunciosMostrarVista extends VerticalLayout implements View {
 		for(int i = 0; i < anuncios; i++) {
 			if(ind < apartamentos.size()) {
 				HorizontalLayout hl = new HorizontalLayout();
-				hl.setWidth(580.0f, Unit.PIXELS);
-				hl.setHeight(200.0f, Unit.PIXELS);
+				hl.setWidth("90%");
+				hl.setHeight(230.0f, Unit.PIXELS);
 				Apartamento apartamento = apartamentos.get(ind++);
 				GridLayout panfoto = new GridLayout();
 				panfoto.setWidth(200.0f, Unit.PIXELS);
@@ -66,18 +70,36 @@ public class AnunciosMostrarVista extends VerticalLayout implements View {
 				panfoto.addComponent(foto);
 				panfoto.setComponentAlignment(foto, Alignment.MIDDLE_CENTER);
 				hl.addComponent(panfoto);
+				hl.setComponentAlignment(panfoto, Alignment.MIDDLE_RIGHT);
 				
-				hl.addComponent(new Label(apartamento.getDescripcion()));
+				TextArea contenido = new TextArea();
+				contenido.setValue(apartamento.getDescripcion());
+				contenido.addStyleName(ValoTheme.TEXTAREA_BORDERLESS);
+				contenido.setReadOnly(true);
+				contenido.setWidth("90%");
+				contenido.setHeight("90%");
+				hl.addComponent(contenido);
+				hl.setComponentAlignment(contenido, Alignment.MIDDLE_CENTER);
+
+				VerticalLayout der = new VerticalLayout();
+				Label dir = new Label(apartamento.getPoblacion());
+				der.addComponent(dir);
+
+				dir = new Label(apartamento.getPais());
+				der.addComponent(dir);
 				
-				Button ver = new Button("Ver mas");
+				Button ver = new Button("Ver más");
+				ver.addStyleName(ValoTheme.BUTTON_PRIMARY);
 				ver.addClickListener(new ClickListener() {
 					@Override
 					public void buttonClick(ClickEvent event) {
 						getUI().getNavigator().navigateTo(AnuncioVerVista.NOMBRE + "/" + apartamento.getId());
 					}
 				});
-				hl.addComponent(ver);
-				
+				der.addComponent(ver);
+				hl.addComponent(der);
+				hl.setComponentAlignment(der, Alignment.MIDDLE_LEFT);
+
 				vl.addComponent(hl);
 				vl.setComponentAlignment(hl, Alignment.MIDDLE_CENTER);
 			} else {

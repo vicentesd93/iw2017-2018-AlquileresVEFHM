@@ -28,6 +28,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
@@ -50,10 +51,12 @@ import com.vaadin.ui.themes.ValoTheme;
 import es.uca.iw.AlquileresVEFHM.DAO.ApartamentoDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.Foto_apartamentoDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.OfertaDAO;
+import es.uca.iw.AlquileresVEFHM.DAO.ReservaOfertaDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.Apartamento;
 import es.uca.iw.AlquileresVEFHM.modelos.Foto_apartamento;
 import es.uca.iw.AlquileresVEFHM.modelos.Oferta;
+import es.uca.iw.AlquileresVEFHM.modelos.ReservaOferta;
 import es.uca.iw.AlquileresVEFHM.modelos.User;
 import es.uca.iw.AlquileresVEFHM.seguridad.SeguridadUtil;
 
@@ -66,6 +69,7 @@ public class ApartamentosVista extends VerticalLayout implements View {
 	private final ApartamentoDAO aparDao;
 	private final Foto_apartamentoDAO faDao;
 	private final OfertaDAO ofertaDao;
+	private final ReservaOfertaDAO roDao;
 	
 	private Integer windowfotoindice = 0;
 	private Apartamento apartamento;
@@ -73,11 +77,12 @@ public class ApartamentosVista extends VerticalLayout implements View {
 	private Foto_apartamento foto_apartamento;
 	
 	@Autowired
-	public ApartamentosVista(UserDAO ud, ApartamentoDAO ad, Foto_apartamentoDAO fd, OfertaDAO od) {
+	public ApartamentosVista(UserDAO ud, ApartamentoDAO ad, Foto_apartamentoDAO fd, OfertaDAO od, ReservaOfertaDAO rod) {
 		userDao = ud;
 		aparDao = ad;
 		faDao = fd;
 		ofertaDao = od;
+		roDao = rod;
 	}
 
 	@PostConstruct
@@ -98,7 +103,7 @@ public class ApartamentosVista extends VerticalLayout implements View {
 		titulo.addStyleName(ValoTheme.LABEL_HUGE);
 		addComponent(titulo);
 		
-		addComponent(new Label("Para editar el apartamento haga 2 clicks en el mismo"));
+		addComponent(new Label("Para editar el apartamento haga doble clicks en el mismo"));
 		
 		TextField Edescripcion = new TextField();
 		TextField Edireccion = new TextField();
@@ -155,20 +160,79 @@ public class ApartamentosVista extends VerticalLayout implements View {
 				Grid<Oferta> gridoferta = new Grid<>();
 				gridoferta.setSizeFull();
 				gridoferta.setItems(ofertas);
-				gridoferta.setSelectionMode(SelectionMode.NONE);
+				gridoferta.setSelectionMode(SelectionMode.SINGLE);
 				gridoferta.addColumn(Oferta::getFecha).setCaption("Fecha").setId("fecha");
 				gridoferta.addColumn(Oferta::getPrecio).setCaption("Precio");
 				gridoferta.addColumn(Oferta::getPenalizacion).setCaption("Penalización");
-				/*gridoferta.addComponentColumn(oferta -> {
-					CheckBox reservado = new CheckBox();
-					if(oferta.getReserva() != null) reservado.setValue(oferta.getReserva().isAceptada());
-					else reservado.setValue(false);
-					reservado.setReadOnly(true);
-					return reservado;
-				}).setCaption("Reservado");*/
 				gridoferta.sort("fecha");
 				vl.addComponent(gridoferta);
 				
+				Button bor = new Button("Eliminar");
+				bor.setEnabled(false);
+				vl.addComponent(bor);
+				vl.setComponentAlignment(bor, Alignment.MIDDLE_CENTER);
+				
+				gridoferta.addSelectionListener(new SelectionListener<Oferta>() {
+					@Override
+					public void selectionChange(SelectionEvent<Oferta> event) {
+						bor.setEnabled(event.getFirstSelectedItem().isPresent());
+					}
+				});
+				
+				bor.addClickListener(new ClickListener() {
+					@Override
+					public void buttonClick(ClickEvent event) {
+						Window eliminar = new Window("Eliminar oferta");
+						eliminar.setWidth(100.0f, Unit.PIXELS);
+						eliminar.setModal(true);
+						eliminar.setResizable(false);
+						eliminar.setClosable(false);
+						eliminar.setDraggable(false);
+						
+						VerticalLayout vl = new VerticalLayout();
+						eliminar.setContent(vl);
+
+						Label mensaje = new Label("¿Eliminar oferta?");
+						vl.addComponent(mensaje);
+						vl.setComponentAlignment(mensaje, Alignment.MIDDLE_CENTER);
+						
+						HorizontalLayout hl = new HorizontalLayout();
+						vl.addComponent(hl);
+						
+						hl.setWidth("100%");
+						Button si = new Button("Si", new ClickListener() {
+							@Override
+							public void buttonClick(ClickEvent e) {
+								Oferta o = gridoferta.asSingleSelect().getValue();
+								for(ReservaOferta ro : o.getReservasofertas()) {
+									roDao.deleteById(ro.getId());
+								}
+								ofertaDao.delete(o);
+								ofertas.remove(o);
+								gridoferta.setItems(ofertas);
+								gridoferta.getDataProvider().refreshAll();
+								Notification.show("Oferta anulada", Notification.TYPE_WARNING_MESSAGE);
+								eliminar.close();
+								bor.setEnabled(false);
+							}
+						});
+						si.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+						hl.addComponent(si);
+						hl.setComponentAlignment(si, Alignment.MIDDLE_CENTER);
+						
+						Button no = new Button("No", new ClickListener() {
+							@Override
+							public void buttonClick(ClickEvent event) {
+								eliminar.close();
+							}
+						});
+						no.addStyleName(ValoTheme.BUTTON_DANGER);
+						hl.addComponent(no);
+						hl.setComponentAlignment(no, Alignment.MIDDLE_CENTER);
+						
+						getUI().getUI().addWindow(eliminar);
+					}
+				});
 				Label nueva = new Label("Nueva oferta");
 				nueva.addStyleName(ValoTheme.LABEL_H3);
 				vl.addComponent(nueva);
@@ -521,7 +585,101 @@ public class ApartamentosVista extends VerticalLayout implements View {
 		opciones.addComponent(crearBotonOpcion("Modificar", new ClickListener() {
 			@Override
 			public void buttonClick(ClickEvent event) {
+				apartamento = grid.asSingleSelect().getOptionalValue().get();
+				Window modi = new Window();
+				modi.setWidth(400.0f, Unit.PIXELS);
+				modi.setResizable(false);
+				modi.setDraggable(false);
+				modi.setModal(true);
 				
+				Binder<Apartamento> binder = new Binder<>();
+				binder.setBean(apartamento);
+				
+				FormLayout form = new FormLayout();
+				form.setMargin(true);
+				Label titulo = new Label("Modificar carácteristicas");
+				titulo.addStyleName(ValoTheme.LABEL_H3);
+				titulo.addStyleName(ValoTheme.LABEL_COLORED);
+				form.addComponent(titulo);
+				
+				TextField dormitorios = new TextField("Dormitorios");
+				form.addComponent(dormitorios);
+				binder.forField(dormitorios)
+					.asRequired("Introduzca el número de dormitorios del inmueble")
+					.withConverter(Integer::valueOf, String::valueOf, "Debe introducir un numero")
+					.withValidator(integer -> integer >= 0, "Debe introducir un valor positivo")
+					.bind(Apartamento::getDormitorios, Apartamento::setDormitorios);
+				
+				TextField aseos = new TextField("Aseos");
+				form.addComponent(aseos);
+				binder.forField(aseos)
+					.asRequired("Introduzca el número de aseos del inmueble")
+					.withConverter(Integer::valueOf, String::valueOf, "Debe introducir un numero")
+					.withValidator(integer -> integer >= 0, "Debe introducir un valor positivo")
+					.bind(Apartamento::getAseos, Apartamento::setAseos);
+				
+				TextField m2 = new TextField("M2");
+				form.addComponent(m2);
+				binder.forField(m2)
+					.asRequired("Introduzca los metros cuadrados del inmueble")
+					.withConverter(Integer::valueOf, String::valueOf, "Debe introducir un numero")
+					.withValidator(integer -> integer >= 0, "Debe introducir un valor positivo")
+					.bind(Apartamento::getM2, Apartamento::setM2);
+				
+				CheckBox amueblado = new CheckBox("Amueblado", false);
+				form.addComponent(amueblado);
+				binder.forField(amueblado)
+					.bind(Apartamento::isAmueblado, Apartamento::setAmueblado);
+				
+				CheckBox ascensor = new CheckBox("Ascensor", false);
+				form.addComponent(ascensor);
+				binder.forField(ascensor)
+					.bind(Apartamento::isAscensor, Apartamento::setAscensor);
+				
+				CheckBox garaje = new CheckBox("Garaje", false);
+				form.addComponent(garaje);
+				binder.forField(garaje)
+					.bind(Apartamento::isGaraje, Apartamento::setGaraje);
+				
+				CheckBox trastero = new CheckBox("Trastero", false);
+				form.addComponent(trastero);
+				binder.forField(trastero)
+					.bind(Apartamento::isTrastero, Apartamento::setTrastero);
+				
+				CheckBox jardin = new CheckBox("Jardin", false);
+				form.addComponent(jardin);
+				binder.forField(jardin)
+				.bind(Apartamento::isJardin, Apartamento::setJardin);
+				
+				CheckBox piscina = new CheckBox("Piscina", false);
+				form.addComponent(piscina);
+				binder.forField(piscina)
+					.bind(Apartamento::isPiscina, Apartamento::setPiscina);
+				
+				CheckBox mascotas = new CheckBox("Mascotas", false);
+				form.addComponent(mascotas);
+				binder.forField(mascotas)
+					.bind(Apartamento::isMascotas, Apartamento::setMascotas);
+				
+				Button mod = new Button("Modificar", new ClickListener() {
+					@Override
+					public void buttonClick(ClickEvent event) {
+						if(binder.isValid()) {
+							Apartamento p = aparDao.findById(apartamento.getId()).get();
+							try {
+								binder.writeBean(p);
+								aparDao.save(p);
+								Notification.show("Apartamento modificado correctamente", Notification.TYPE_WARNING_MESSAGE);
+								modi.close();
+							} catch (ValidationException e) {
+								Notification.show("Hubo un error inesperado, intentelo de nuevo", Notification.TYPE_WARNING_MESSAGE);
+							}
+						}
+					}
+				});
+				form.addComponent(mod);
+				modi.setContent(form);
+				getUI().addWindow(modi);
 			}
 		}));
 		addComponent(opciones);

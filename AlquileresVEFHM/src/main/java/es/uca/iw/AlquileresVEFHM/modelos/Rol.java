@@ -15,6 +15,7 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.security.core.GrantedAuthority;
 
+@SuppressWarnings("serial")
 @Entity
 @Table(name="rol")
 public class Rol implements GrantedAuthority {

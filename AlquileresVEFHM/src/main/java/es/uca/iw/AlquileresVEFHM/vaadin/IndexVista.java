@@ -43,7 +43,6 @@ public class IndexVista extends VerticalLayout implements ViewDisplay {
 		barraNavegacion.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 		barraNavegacion.addComponent(crearBotonNavegacion("Inicio", AnunciosMostrarVista.NOMBRE));
 		barraNavegacion.addComponent(crearBotonNavegacion("Buscar", BuscarApartamentos.NOMBRE));
-		barraNavegacion.addComponent(crearBotonNavegacion("Contacto", LoginVista.NOMBRE));
 
 		if(!SeguridadUtil.isLoggedIn()) {
 			barraNavegacion.addComponent(crearBotonNavegacion("Iniciar sesión", LoginVista.NOMBRE));
