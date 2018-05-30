@@ -102,4 +102,11 @@ public class Oferta {
 	public void setLDFecha(LocalDate f) {
 		fecha = Date.from(f.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
 	}
+
+	@Override
+	public String toString() {
+		return "Oferta [id=" + id + ", precio=" + precio + ", fecha=" + fecha + ", penalizacion=" + penalizacion + "]";
+	}
+	
+	
 }
