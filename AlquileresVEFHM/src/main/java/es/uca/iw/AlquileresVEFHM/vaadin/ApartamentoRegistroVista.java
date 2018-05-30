@@ -44,9 +44,9 @@ import es.uca.iw.AlquileresVEFHM.modelos.User;
 import es.uca.iw.AlquileresVEFHM.seguridad.SeguridadUtil;
 
 
+@SuppressWarnings({"serial", "deprecation"})
 @SpringView(name = ApartamentoRegistroVista.NOMBRE)
 public class ApartamentoRegistroVista extends VerticalLayout implements View {
-	private static final long serialVersionUID = 1L;
 	public static final String NOMBRE = "registro_apartamento";
 	private User usuario;
 	

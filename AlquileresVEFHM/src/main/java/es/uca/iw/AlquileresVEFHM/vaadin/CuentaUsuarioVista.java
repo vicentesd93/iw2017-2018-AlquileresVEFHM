@@ -2,8 +2,8 @@ package es.uca.iw.AlquileresVEFHM.vaadin;
 
 import java.time.ZoneId;
 import java.util.Date;
+
 import javax.annotation.PostConstruct;
-import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -36,14 +36,13 @@ import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.User;
 import es.uca.iw.AlquileresVEFHM.seguridad.SeguridadUtil;
 
+@SuppressWarnings({"serial", "deprecation"})
 @SpringView(name = CuentaUsuarioVista.NOMBRE)
 public class CuentaUsuarioVista extends HorizontalLayout implements View {
-	private static final long serialVersionUID = 1L;
 	public final static String NOMBRE = "cuenta_usuario";
 	private User usuario;
 	private UserDAO userDao;
 	private PasswordEncoder passwordEncoder;
-	private EntityManager manager;
 	
 	private Component misDatos() {
 		
@@ -328,11 +327,8 @@ public class CuentaUsuarioVista extends HorizontalLayout implements View {
 	private Component borrarCuenta() {
 		VerticalLayout vl = new VerticalLayout();
 		vl.setSizeFull();
-		
-		Binder<User> binder = new Binder<>();
-        
+		        
         Button Eliminar = new Button("Eliminar", event -> {
-      		User u = userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado());
       		//System.out.println("------------------->"+userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado()).getNombre());
       		//userDao.delete(u);
       		userDao.deleteById(userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado()).getId());

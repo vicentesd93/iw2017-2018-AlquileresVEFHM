@@ -142,13 +142,13 @@ public class ApartamentosVista extends VerticalLayout implements View {
 				gridoferta.addColumn(Oferta::getFecha).setCaption("Fecha").setId("fecha");
 				gridoferta.addColumn(Oferta::getPrecio).setCaption("Precio");
 				gridoferta.addColumn(Oferta::getPenalizacion).setCaption("Penalización");
-				gridoferta.addComponentColumn(oferta -> {
+				/*gridoferta.addComponentColumn(oferta -> {
 					CheckBox reservado = new CheckBox();
 					if(oferta.getReserva() != null) reservado.setValue(oferta.getReserva().isAceptada());
 					else reservado.setValue(false);
 					reservado.setReadOnly(true);
 					return reservado;
-				}).setCaption("Reservado");
+				}).setCaption("Reservado");*/
 				gridoferta.sort("fecha");
 				vl.addComponent(gridoferta);
 				
@@ -211,6 +211,7 @@ public class ApartamentosVista extends VerticalLayout implements View {
 								Oferta ofer = new Oferta();
 								while(fec.compareTo(f_fin.getValue()) != 1) {
 									try {
+										ofer = new Oferta();
 										binder.writeBean(ofer);
 										ofer.setApartamento(grid.asSingleSelect().getOptionalValue().get());
 										ofer.setLDFecha(fec);

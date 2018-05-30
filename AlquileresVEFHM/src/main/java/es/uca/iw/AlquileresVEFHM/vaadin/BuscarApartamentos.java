@@ -1,20 +1,12 @@
 package es.uca.iw.AlquileresVEFHM.vaadin;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
-import javax.sound.midi.Soundbank;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,39 +15,28 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
-import com.vaadin.ui.ItemCaptionGenerator;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.PasswordField;
-import com.vaadin.ui.RadioButtonGroup;
-import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.Grid.SelectionMode;
-import com.vaadin.ui.components.grid.EditorSaveEvent;
-import com.vaadin.ui.components.grid.EditorSaveListener;
 import com.vaadin.ui.themes.ValoTheme;
 
+import es.uca.iw.AlquileresVEFHM.DAO.OfertaDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.Apartamento;
 import es.uca.iw.AlquileresVEFHM.modelos.Foto_apartamento;
 import es.uca.iw.AlquileresVEFHM.modelos.Oferta;
-import es.uca.iw.AlquileresVEFHM.DAO.OfertaDAO;
-import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
-import es.uca.iw.AlquileresVEFHM.modelos.User;
-import es.uca.iw.AlquileresVEFHM.seguridad.SeguridadUtil;
 
+@SuppressWarnings({"serial", "deprecation"})
 @SpringView(name = BuscarApartamentos.NOMBRE)
 public class BuscarApartamentos extends VerticalLayout implements View {
-	private static final long serialVersionUID = 1L;
 	public static final String NOMBRE = "buscarApartamentos";
 	private Integer windowfotoindice = 0;
 	private OfertaDAO ofertaDao;
