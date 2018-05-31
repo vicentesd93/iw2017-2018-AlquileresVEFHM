@@ -109,9 +109,6 @@ public class ApartamentoBuscar extends VerticalLayout implements View {
 					    	Oferta a = it.next();
 					    	dir = false;pob = false;pai = false; m2b = false;ase = false;dor = false;
 					    	
-					    	/*if() {
-					    		Ofertas futuras
-					    	}*/
 					    	
 					    	if (a.getApartamento().getDireccion().equals(direccion.getValue()) || direccion.isEmpty()) {
 					    		dir = true;
@@ -126,7 +123,7 @@ public class ApartamentoBuscar extends VerticalLayout implements View {
 							}
 					    	
 					    	try {
-						    	if (Integer.parseInt(m2.getValue()) >= a.getApartamento().getM2()) {
+						    	if (Integer.parseInt(m2.getValue()) < a.getApartamento().getM2()) {
 						    		m2b = true;
 								}
 					    	}catch (NumberFormatException e) {
@@ -134,7 +131,7 @@ public class ApartamentoBuscar extends VerticalLayout implements View {
 							}
 					    	
 					    	try {
-						    	if (Integer.parseInt(aseos.getValue()) >= a.getApartamento().getAseos()) {
+						    	if (Integer.parseInt(aseos.getValue()) < a.getApartamento().getAseos()) {
 						    		ase = true;
 								}
 					    	}catch (NumberFormatException e) {
@@ -142,7 +139,7 @@ public class ApartamentoBuscar extends VerticalLayout implements View {
 					    	}
 					    	
 					    	try {
-						    	if (Integer.parseInt(dormitorios.getValue()) >= a.getApartamento().getDormitorios()) {
+						    	if (Integer.parseInt(dormitorios.getValue()) < a.getApartamento().getDormitorios()) {
 						    		dor = true;
 								}
 					    	}catch (NumberFormatException e) {
