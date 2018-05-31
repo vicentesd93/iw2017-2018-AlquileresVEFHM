@@ -109,16 +109,15 @@ public class ApartamentoBuscar extends VerticalLayout implements View {
 					    	Oferta a = it.next();
 					    	dir = false;pob = false;pai = false; m2b = false;ase = false;dor = false;
 					    	
-					    	
-					    	if (a.getApartamento().getDireccion().equals(direccion.getValue()) || direccion.isEmpty()) {
+					    	if (a.getApartamento().getDireccion().toLowerCase().contains(direccion.getValue().toLowerCase()) || direccion.isEmpty()) {
 					    		dir = true;
 							}
 					    	
-					    	if (a.getApartamento().getPoblacion().equals(poblacion.getValue()) || poblacion.isEmpty()) {
+					    	if (a.getApartamento().getPoblacion().toLowerCase().contains(poblacion.getValue().toLowerCase()) || poblacion.isEmpty()) {
 					    		pob = true;
 							}
 					    	
-					    	if (a.getApartamento().getPais().equals(pais.getValue()) || pais.isEmpty()) {
+					    	if (a.getApartamento().getPais().toLowerCase().contains(pais.getValue().toLowerCase()) || pais.isEmpty()) {
 					    		pai = true;
 							}
 					    	
