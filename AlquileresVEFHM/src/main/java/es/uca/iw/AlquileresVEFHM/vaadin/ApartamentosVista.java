@@ -682,6 +682,16 @@ public class ApartamentosVista extends VerticalLayout implements View {
 				getUI().addWindow(modi);
 			}
 		}));
+
+		opciones.addComponent(crearBotonOpcion("Eliminar", new ClickListener() {
+			@Override
+			public void buttonClick(ClickEvent event) {
+				Notification.show("Apartamento eliminado correctamente", Notification.TYPE_TRAY_NOTIFICATION);
+				aparDao.deleteById(grid.asSingleSelect().getOptionalValue().get().getId());
+				grid.setItems(userDao.findByLogin(usuario.getLogin()).getApartamentos());
+			}
+		}));
+		
 		addComponent(opciones);
 		setComponentAlignment(opciones, Alignment.MIDDLE_CENTER);		
 		grid.addSelectionListener(new SelectionListener<Apartamento>() {

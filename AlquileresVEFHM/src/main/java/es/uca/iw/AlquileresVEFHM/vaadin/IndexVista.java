@@ -16,6 +16,10 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import es.uca.iw.AlquileresVEFHM.seguridad.SeguridadUtil;
+import es.uca.iw.AlquileresVEFHM.vaadin.*;
+
+
+
 
 @SuppressWarnings("serial")
 @SpringViewDisplay
@@ -72,6 +76,8 @@ public class IndexVista extends VerticalLayout implements ViewDisplay {
 				barraNavegacion.addComponent(crearBotonNavegacion("Reservas",ReservaAnfitrionVista.NOMBRE));
 			}else if(SeguridadUtil.getRol().equals("Huesped")) {
 				barraNavegacion.addComponent(crearBotonNavegacion("Reservas",ReservaHuespedVista.NOMBRE));
+			}else if(SeguridadUtil.getRol().equals("admin")) {
+				barraNavegacion.addComponent(crearBotonNavegacion("Administracion",AdministracionIndex.NOMBRE));
 			}
 			Button logoutButton = new Button("Cerrar sesión", event -> logout());
 			logoutButton.setStyleName(ValoTheme.BUTTON_SMALL);
