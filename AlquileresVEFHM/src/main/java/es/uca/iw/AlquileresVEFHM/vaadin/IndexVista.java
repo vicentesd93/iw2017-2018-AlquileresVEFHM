@@ -1,14 +1,26 @@
 package es.uca.iw.AlquileresVEFHM.vaadin;
 
+import java.io.File;
+
 import javax.annotation.PostConstruct;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewDisplay;
+import com.vaadin.server.ClassResource;
+import com.vaadin.server.ExternalResource;
+import com.vaadin.server.FileResource;
+import com.vaadin.server.Resource;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinService;
 import com.vaadin.spring.annotation.SpringViewDisplay;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Embedded;
+import com.vaadin.ui.Image;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Link;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Panel;
@@ -42,6 +54,10 @@ public class IndexVista extends VerticalLayout implements ViewDisplay {
 	void init() {
 		final VerticalLayout root = new VerticalLayout();
 		root.setWidth("100%");
+	
+		FileResource resource = new FileResource(new File( "img/logo-inmo.png"));
+		Embedded logo = new Embedded(null, resource);		
+		root.addComponent(logo);
 		
 		final CssLayout barraNavegacion = new CssLayout();
 		barraNavegacion.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
