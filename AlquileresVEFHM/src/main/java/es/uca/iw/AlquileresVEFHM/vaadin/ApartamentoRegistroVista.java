@@ -289,6 +289,7 @@ public class ApartamentoRegistroVista extends VerticalLayout implements View {
 					a.setFotos_apartamento(fotos);
 					aparDao.save(a);
 					Notification.show("Apartamento registrado correctamente", Notification.TYPE_TRAY_NOTIFICATION).setPosition(Notification.POSITION_CENTERED_TOP);
+					getUI().getNavigator().navigateTo(ApartamentosVista.NOMBRE);
 				} catch (Exception e) {
 	        		Notification.show("Ha ocurrido un error intentelo de nuevo", Notification.TYPE_ERROR_MESSAGE);
 				}
