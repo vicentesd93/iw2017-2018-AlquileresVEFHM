@@ -95,13 +95,74 @@ public class ReservaAnfitrionVista extends VerticalLayout implements View {
 		Label titulo = new Label("Reservas");
 		titulo.addStyleNames(ValoTheme.LABEL_HUGE);
 		addComponent(titulo);
+		Grid<Reserva> gridaceptadas = new Grid<>();
+		Grid<Reserva> gridrechazadas = new Grid<>();
 		
-		Label lblaceptada = new Label("Reservas aceptadas");
+		Label lblaceptada = new Label("Reservas pendientes");
+		lblaceptada.addStyleName(ValoTheme.LABEL_H3);
+		addComponent(lblaceptada);
+		
+		Grid<Reserva> gridpendientes = new Grid<>();
+		gridpendientes.setSelectionMode(SelectionMode.NONE);
+		gridpendientes.setWidth("100%");
+		gridpendientes.addComponentColumn(reserva -> {
+			Button b = new Button("Ver ofertas");
+			b.addStyleName(ValoTheme.BUTTON_BORDERLESS_COLORED);
+			b.addClickListener(verofertas(reserva));
+			return b;
+		}).setCaption("Ofertas");
+		gridpendientes.addComponentColumn(reserva -> {
+			Button b = new Button("Aceptar");
+			b.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+			b.addClickListener(new ClickListener() {
+				@Override
+				public void buttonClick(ClickEvent event) {
+					reserva.setAceptada(true);
+					reservaDao.save(reserva);
+					reservasaceptadas.add(reserva);
+					gridaceptadas.setItems(reservasaceptadas);
+					gridaceptadas.getDataProvider().refreshAll();
+					reservaspendientes.remove(reserva);
+					gridpendientes.setItems(reservaspendientes);
+					gridpendientes.getDataProvider().refreshAll();
+					Notification.show("Reserva aceptada", Notification.TYPE_WARNING_MESSAGE);
+				}
+			});
+			return b;
+		});
+		gridpendientes.addComponentColumn(reserva -> {
+			Button b = new Button("Rechazar");
+			b.addStyleName(ValoTheme.BUTTON_DANGER);
+			b.addClickListener(new ClickListener() {
+				@Override
+				public void buttonClick(ClickEvent event) {
+					reserva.setRechazada(true);
+					reservaDao.save(reserva);
+					reservasrechazadas.add(reserva);
+					gridrechazadas.setItems(reservasrechazadas);
+					gridrechazadas.getDataProvider().refreshAll();
+					reservaspendientes.remove(reserva);
+					gridpendientes.setItems(reservaspendientes);
+					gridpendientes.getDataProvider().refreshAll();
+					Notification.show("Reserva rechazada", Notification.TYPE_WARNING_MESSAGE);
+				}
+			});
+			return b;
+		});
+		gridpendientes.addComponentColumn(reserva -> new Label(reserva.getHuesped().getNombre()+" "+reserva.getHuesped().getApellidos())).setCaption("Nombre del huesped");
+		gridpendientes.addComponentColumn(reserva -> new Label(reserva.getHuesped().getTelefono())).setCaption("Teléfono");
+		gridpendientes.addComponentColumn(reserva -> new Label(reserva.getReservasofertas().iterator().next().getOferta().getApartamento().getDireccionCompleta())).setCaption("Apartamento");
+		gridpendientes.setItems(reservaspendientes);
+		addComponent(gridpendientes);
+		
+		
+		
+		 lblaceptada = new Label("Reservas aceptadas");
 		lblaceptada.addStyleName(ValoTheme.LABEL_H3);
 		addComponent(lblaceptada);
 		
 		
-		Grid<Reserva> gridaceptadas = new Grid<>();
+		
 		gridaceptadas.setSelectionMode(SelectionMode.NONE);
 		gridaceptadas.setWidth("100%");
 		gridaceptadas.addComponentColumn(reserva -> {
@@ -186,7 +247,7 @@ public class ReservaAnfitrionVista extends VerticalLayout implements View {
 		lblaceptada.addStyleName(ValoTheme.LABEL_H3);
 		addComponent(lblaceptada);
 		
-		Grid<Reserva> gridrechazadas = new Grid<>();
+		
 		gridrechazadas.setSelectionMode(SelectionMode.NONE);
 		gridrechazadas.setWidth("100%");
 		gridrechazadas.addComponentColumn(reserva -> {
@@ -201,62 +262,7 @@ public class ReservaAnfitrionVista extends VerticalLayout implements View {
 		gridrechazadas.setItems(reservasrechazadas);
 		addComponent(gridrechazadas);
 		
-		lblaceptada = new Label("Reservas pendientes");
-		lblaceptada.addStyleName(ValoTheme.LABEL_H3);
-		addComponent(lblaceptada);
 		
-		Grid<Reserva> gridpendientes = new Grid<>();
-		gridpendientes.setSelectionMode(SelectionMode.NONE);
-		gridpendientes.setWidth("100%");
-		gridpendientes.addComponentColumn(reserva -> {
-			Button b = new Button("Ver ofertas");
-			b.addStyleName(ValoTheme.BUTTON_BORDERLESS_COLORED);
-			b.addClickListener(verofertas(reserva));
-			return b;
-		}).setCaption("Ofertas");
-		gridpendientes.addComponentColumn(reserva -> {
-			Button b = new Button("Aceptar");
-			b.addStyleName(ValoTheme.BUTTON_FRIENDLY);
-			b.addClickListener(new ClickListener() {
-				@Override
-				public void buttonClick(ClickEvent event) {
-					reserva.setAceptada(true);
-					reservaDao.save(reserva);
-					reservasaceptadas.add(reserva);
-					gridaceptadas.setItems(reservasaceptadas);
-					gridaceptadas.getDataProvider().refreshAll();
-					reservaspendientes.remove(reserva);
-					gridpendientes.setItems(reservaspendientes);
-					gridpendientes.getDataProvider().refreshAll();
-					Notification.show("Reserva aceptada", Notification.TYPE_WARNING_MESSAGE);
-				}
-			});
-			return b;
-		});
-		gridpendientes.addComponentColumn(reserva -> {
-			Button b = new Button("Rechazar");
-			b.addStyleName(ValoTheme.BUTTON_DANGER);
-			b.addClickListener(new ClickListener() {
-				@Override
-				public void buttonClick(ClickEvent event) {
-					reserva.setRechazada(true);
-					reservaDao.save(reserva);
-					reservasrechazadas.add(reserva);
-					gridrechazadas.setItems(reservasrechazadas);
-					gridrechazadas.getDataProvider().refreshAll();
-					reservaspendientes.remove(reserva);
-					gridpendientes.setItems(reservaspendientes);
-					gridpendientes.getDataProvider().refreshAll();
-					Notification.show("Reserva rechazada", Notification.TYPE_WARNING_MESSAGE);
-				}
-			});
-			return b;
-		});
-		gridpendientes.addComponentColumn(reserva -> new Label(reserva.getHuesped().getNombre()+" "+reserva.getHuesped().getApellidos())).setCaption("Nombre del huesped");
-		gridpendientes.addComponentColumn(reserva -> new Label(reserva.getHuesped().getTelefono())).setCaption("Teléfono");
-		gridpendientes.addComponentColumn(reserva -> new Label(reserva.getReservasofertas().iterator().next().getOferta().getApartamento().getDireccionCompleta())).setCaption("Apartamento");
-		gridpendientes.setItems(reservaspendientes);
-		addComponent(gridpendientes);
 		
 	}
 	
