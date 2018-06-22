@@ -1,7 +1,5 @@
 package es.uca.iw.AlquileresVEFHM.vaadin;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -10,21 +8,10 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.vaadin.data.Binder;
-import com.vaadin.data.converter.StringToFloatConverter;
-import com.vaadin.data.converter.StringToIntegerConverter;
 import com.vaadin.navigator.View;
-import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
-import com.vaadin.server.Page;
-import com.vaadin.server.StreamResource;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -36,7 +23,6 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Link;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -46,7 +32,6 @@ import es.uca.iw.AlquileresVEFHM.DAO.ApartamentoDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.OfertaDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.Apartamento;
 import es.uca.iw.AlquileresVEFHM.modelos.Oferta;
-import es.uca.iw.AlquileresVEFHM.modelos.User;
 
 @SuppressWarnings({"serial", "deprecation"})
 @SpringView(name = AnunciosMostrarVista.NOMBRE)
@@ -68,7 +53,7 @@ public class AnunciosMostrarVista extends VerticalLayout implements View {
 	@PostConstruct
 	void init() {
 		List<Apartamento> apartamentosParaMostrar = new ArrayList<Apartamento>();
-		
+
 		//Huesped busque apartamentos -> TRAERNOS TODOS LOS APARTAMENTOS DE LA BD [PENDIENTE FILTRAR]
 		//Huesped posibilidad de que pueda reservar un apartamento
 		
@@ -90,27 +75,16 @@ public class AnunciosMostrarVista extends VerticalLayout implements View {
 		HorizontalLayout hl2= new HorizontalLayout();
 		HorizontalLayout hl3 = new HorizontalLayout();
 		
-		TextField direccion = new TextField("Dirección");    
+		TextField direccion = new TextField("Dirección");
 		TextField poblacion = new TextField("Población");
 		TextField pais = new TextField("País");
-		TextField m2 = new TextField("Metros cuadrados (>= m2) ");
+		TextField m2 = new TextField("Metros cuadrados (>= m2) ");	
 		TextField aseos = new TextField("Aseos (>= aseos)");
 		TextField dormitorios = new TextField("Dormitorios (>= dormitorios)");
 		TextField precioMax = new TextField("Precio maximo");
 		TextField precioMin = new TextField("Precio minimo");
 		DateField rangoFechaInicio = new DateField("Fecha inicio");
 		DateField rangoFechaFin = new DateField("Fecha fin");
-		
-		Button pdf = new Button("PDF");
-		pdf.setWidth("100px");
-		pdf.setHeight("70px");
-		pdf.addStyleName(ValoTheme.BUTTON_BORDERLESS_COLORED);
-		pdf.addClickListener(new ClickListener() {
-				public void buttonClick(ClickEvent event) {
-							
-				}
-			});
-		
 		
 		Button filtrar = new Button("Buscar");
 		filtrar.setWidth("100px");
@@ -161,6 +135,7 @@ public class AnunciosMostrarVista extends VerticalLayout implements View {
 						    	}catch (NumberFormatException e) {
 						    		dor = true;
 						    	}
+						    	//-----------------------------
 						    	try {
 							    	if (Integer.parseInt(precioMax.getValue()) >= a.getPrecio()) {
 							    		preciomax = true;
@@ -213,7 +188,6 @@ public class AnunciosMostrarVista extends VerticalLayout implements View {
 		hl2.addComponent(rangoFechaInicio);
 		hl2.addComponent(rangoFechaFin);
 		hl3.addComponent(filtrar);
-		hl3.addComponent(pdf);
 		
 		vlFiltro.addComponent(hl1);
 		vlFiltro.addComponent(hl3);
