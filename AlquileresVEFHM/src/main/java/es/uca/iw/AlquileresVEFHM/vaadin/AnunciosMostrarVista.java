@@ -1,21 +1,15 @@
 package es.uca.iw.AlquileresVEFHM.vaadin;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-
 import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.navigator.View;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Grid;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.DateField;
@@ -27,7 +21,6 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
-
 import es.uca.iw.AlquileresVEFHM.DAO.ApartamentoDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.OfertaDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.Apartamento;

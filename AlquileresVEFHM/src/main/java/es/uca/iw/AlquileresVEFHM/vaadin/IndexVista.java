@@ -20,7 +20,6 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import es.uca.iw.AlquileresVEFHM.seguridad.SeguridadUtil;
-import es.uca.iw.AlquileresVEFHM.vaadin.*;
 
 
 

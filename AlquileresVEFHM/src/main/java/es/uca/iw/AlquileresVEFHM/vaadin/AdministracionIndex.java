@@ -1,55 +1,38 @@
 package es.uca.iw.AlquileresVEFHM.vaadin;
 
-
-
 import java.io.ByteArrayOutputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
-
 import javax.annotation.PostConstruct;
 import javax.sql.rowset.serial.SerialBlob;
 import javax.sql.rowset.serial.SerialException;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.text.Style;
-
-import org.hibernate.sql.Select;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.data.Binder;
-import com.vaadin.data.SelectionModel;
 import com.vaadin.data.ValidationException;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.selection.SelectionEvent;
 import com.vaadin.event.selection.SelectionListener;
 import com.vaadin.navigator.View;
-import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
-import com.vaadin.server.StreamVariable;
 import com.vaadin.server.Page.Styles;
-import com.vaadin.server.StreamVariable.StreamingEndEvent;
-import com.vaadin.server.StreamVariable.StreamingErrorEvent;
-import com.vaadin.server.StreamVariable.StreamingProgressEvent;
-import com.vaadin.server.StreamVariable.StreamingStartEvent;
+import com.vaadin.server.StreamVariable;
 import com.vaadin.spring.annotation.SpringView;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Html5File;
-import com.vaadin.ui.Image;
 import com.vaadin.ui.ItemCaptionGenerator;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.NativeSelect;
@@ -60,24 +43,16 @@ import com.vaadin.ui.RadioButtonGroup;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.components.grid.EditorSaveEvent;
 import com.vaadin.ui.components.grid.EditorSaveListener;
-import com.vaadin.ui.components.grid.SingleSelectionModel;
 import com.vaadin.ui.dnd.FileDropTarget;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.themes.ValoTheme;
-import com.vaadin.event.selection.SelectionListener;
-
 import es.uca.iw.AlquileresVEFHM.DAO.ApartamentoDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.RolDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.Tipo_apartamentoDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.Apartamento;
 import es.uca.iw.AlquileresVEFHM.modelos.Foto_apartamento;
-import es.uca.iw.AlquileresVEFHM.modelos.Oferta;
 import es.uca.iw.AlquileresVEFHM.modelos.Tipo_apartamento;
 import es.uca.iw.AlquileresVEFHM.modelos.User;
 import es.uca.iw.AlquileresVEFHM.seguridad.SeguridadUtil;
