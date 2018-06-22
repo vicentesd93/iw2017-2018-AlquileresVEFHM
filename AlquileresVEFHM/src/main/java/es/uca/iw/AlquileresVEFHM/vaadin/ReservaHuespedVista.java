@@ -1,11 +1,18 @@
 package es.uca.iw.AlquileresVEFHM.vaadin;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.data.Binder;
@@ -13,6 +20,7 @@ import com.vaadin.data.HasValue.ValueChangeEvent;
 import com.vaadin.data.HasValue.ValueChangeListener;
 import com.vaadin.data.ValidationException;
 import com.vaadin.navigator.View;
+import com.vaadin.server.FileResource;
 import com.vaadin.server.Page;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
@@ -23,6 +31,7 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Link;
 import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
@@ -164,7 +173,9 @@ public class ReservaHuespedVista extends VerticalLayout implements View {
 					getUI().addWindow(wpago);
 				}
 			});
-			return b;
+			FileResource file = new FileResource(new File("pdf/"+reserva.getFactura().getId()+".pdf"));
+			Link link = new Link("Ver Factura", file);
+			return link;
 		}).setCaption("Factura");
 		gridpagadas.addComponentColumn(reserva -> new Label(df.format(reserva.getFactura().getTotal()))).setCaption("Total €");
 		gridpagadas.addComponentColumn(reserva -> new Label(reserva.getReservasofertas().iterator().next().getOferta().getApartamento().getDireccion())).setCaption("Dirección");
@@ -271,10 +282,35 @@ public class ReservaHuespedVista extends VerticalLayout implements View {
 									facturaDao.save(f);
 									reserva.setFactura(f);
 									reservaDao.save(reserva);
-									Notification.show("Factura generada", Notification.TYPE_WARNING_MESSAGE);
 									wpago.close();
 									removeAllComponents();
 									init();
+									
+									PDPage singlePage = new PDPage();
+									PDFont courierBoldFont = PDType1Font.COURIER_BOLD;
+									int fontSize = 12;
+									try (PDDocument document = new PDDocument()){
+										document.addPage(singlePage);
+										PDPageContentStream contentStream = new PDPageContentStream(document, singlePage);
+										contentStream.beginText();
+										contentStream.setFont(courierBoldFont, fontSize);
+										contentStream.newLineAtOffset(150, 750);
+										contentStream.drawString(reserva.getFactura().getMetodo_pago().getDescripcion() + ": " + reserva.getFactura().getMpvalor());
+										contentStream.newLineAtOffset(0, -15);
+										contentStream.drawString("IVA: "+reserva.getFactura().getIva()+ "%");
+										contentStream.newLineAtOffset(0, -15);
+										contentStream.drawString("Cargo: " + reserva.getFactura().getComision());
+										contentStream.newLineAtOffset(0, -15);
+										contentStream.drawString("Total: " + reserva.getFactura().getTotal());
+										
+										//pdf = pdf.replace("\n", "").replace("\r", "");
+										//contentStream.showText(pdf);
+										contentStream.endText();
+										contentStream.close();  // Stream must be closed before saving document.
+										document.save("pdf/"+reserva.getFactura().getId()+".pdf");
+									}
+									catch (IOException ioEx){}	
+									
 								} catch (ValidationException e) {
 									Notification.show("Error al generar factura", Notification.TYPE_ERROR_MESSAGE);
 									wpago.close();
