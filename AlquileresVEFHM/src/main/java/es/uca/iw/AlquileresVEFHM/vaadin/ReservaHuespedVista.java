@@ -1,5 +1,6 @@
 package es.uca.iw.AlquileresVEFHM.vaadin;
 
+import java.awt.GridBagLayoutInfo;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -34,11 +35,13 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.RadioButtonGroup;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
+import es.uca.iw.AlquileresVEFHM.DAO.ApartamentoDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.FacturaDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.Metodo_pagoDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.ReservaDAO;
@@ -62,13 +65,15 @@ public class ReservaHuespedVista extends VerticalLayout implements View {
 	private final Metodo_pagoDAO mpagDao;
 	private final FacturaDAO facturaDao;
 	private final ReservaDAO reservaDao;
+	private final ApartamentoDAO aparDao;
 	
 	@Autowired
-	public ReservaHuespedVista(UserDAO ud, Metodo_pagoDAO mpd, FacturaDAO fd, ReservaDAO rd) {
+	public ReservaHuespedVista(UserDAO ud, Metodo_pagoDAO mpd, FacturaDAO fd, ReservaDAO rd, ApartamentoDAO ap) {
 		userDao = ud;
 		mpagDao = mpd;
 		facturaDao = fd;
 		reservaDao = rd;
+		aparDao = ap;
 	}
 	
 	@PostConstruct
@@ -160,7 +165,7 @@ public class ReservaHuespedVista extends VerticalLayout implements View {
 					tot3.setReadOnly(true);
 					tot3.addStyleName(ValoTheme.TEXTFIELD_BORDERLESS);
 					vl.addComponent(tot3);
-
+					
 					Button salir = new Button("Cerrar");
 					salir.addClickListener(new ClickListener() {
 						@Override
@@ -182,6 +187,69 @@ public class ReservaHuespedVista extends VerticalLayout implements View {
 		gridpagadas.addComponentColumn(reserva -> new Label(reserva.getReservasofertas().iterator().next().getOferta().getApartamento().getPoblacion())).setCaption("Población");
 		gridpagadas.addComponentColumn(reserva -> new Label(reserva.getReservasofertas().iterator().next().getOferta().getApartamento().getPais())).setCaption("País");
 		gridpagadas.addComponentColumn(reserva -> new Label(reserva.getReservasofertas().iterator().next().getOferta().getApartamento().getDescripcion())).setCaption("Descripción");
+
+		gridpagadas.addComponentColumn(reserva -> {
+			if (!reserva.isValorado()) {
+				Button b = new Button("Valorar");
+				b.addStyleName(ValoTheme.BUTTON_DANGER);
+				b.addClickListener(new ClickListener() {
+					@Override
+					public void buttonClick(ClickEvent event) {
+						Window wpago = new Window();
+						wpago.setModal(true);
+						wpago.setDraggable(false);
+						wpago.setResizable(false);
+						
+						FormLayout vl = new FormLayout();
+						vl.setMargin(true);
+						vl.setWidth(500.0f, Unit.PIXELS);
+						
+						Label titulo = new Label("Valoracion del apartamento:");
+						vl.addComponent(titulo);
+						
+						Label titulo2 = new Label("1 (despreciable) - 5 (recomendable)");
+						vl.addComponent(titulo2);
+						
+						RadioButtonGroup<String> group = new RadioButtonGroup<>();
+						group.setItems("1", "2", "3", "4", "5");
+						group.setSelectedItem("3");
+						vl.addComponent(group);
+						
+						Button valorar = new Button("Valorar");
+						valorar.addStyleName(ValoTheme.BUTTON_DANGER);
+						valorar.addClickListener(new ClickListener() {
+							@Override
+							public void buttonClick(ClickEvent event) {
+								reserva.setValorado(true);
+								reserva.getReservasofertas().iterator().next().getOferta().getApartamento().setValoracion(reserva.getReservasofertas().iterator().next().getOferta().getApartamento().getValoracion() + Integer.parseInt(group.getValue()));
+								reserva.getReservasofertas().iterator().next().getOferta().getApartamento().setN_valoraciones(reserva.getReservasofertas().iterator().next().getOferta().getApartamento().getN_valoraciones()+1);
+								aparDao.save(reserva.getReservasofertas().iterator().next().getOferta().getApartamento());
+								reservaDao.save(reserva);
+								Notification.show("Valoracion realizada", Notification.TYPE_TRAY_NOTIFICATION);
+								wpago.close();
+								getUI().getNavigator().navigateTo(ReservaHuespedVista.NOMBRE);
+							}
+						});
+						Button salir = new Button("Cerrar");
+						salir.addClickListener(new ClickListener() {
+							@Override
+							public void buttonClick(ClickEvent event) {
+								wpago.close();
+							}
+						});
+						vl.addComponent(valorar);
+						vl.addComponent(salir);
+						wpago.setContent(vl);
+						getUI().addWindow(wpago);
+					}
+				});
+				return b;
+			}else {
+				Label lb = new Label("Ya ha sido valorado");
+				lb.addStyleName(ValoTheme.LABEL_COLORED);
+				return lb;
+			}
+		}).setCaption("");		
 		gridpagadas.setItems(reservaspagadas);
 		addComponent(gridpagadas);
 		
@@ -302,11 +370,8 @@ public class ReservaHuespedVista extends VerticalLayout implements View {
 										contentStream.drawString("Cargo: " + reserva.getFactura().getComision());
 										contentStream.newLineAtOffset(0, -15);
 										contentStream.drawString("Total: " + reserva.getFactura().getTotal());
-										
-										//pdf = pdf.replace("\n", "").replace("\r", "");
-										//contentStream.showText(pdf);
 										contentStream.endText();
-										contentStream.close();  // Stream must be closed before saving document.
+										contentStream.close();
 										document.save("pdf/"+reserva.getFactura().getId()+".pdf");
 									}
 									catch (IOException ioEx){}	

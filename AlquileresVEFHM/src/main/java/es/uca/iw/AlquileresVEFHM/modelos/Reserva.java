@@ -31,6 +31,8 @@ public class Reserva {
 	private boolean aceptada;
 	@Column
 	private boolean rechazada;
+	@Column
+	private boolean valorado;
 	@JoinColumn(name = "factura", nullable = true)
 	@OneToOne(fetch = FetchType.LAZY)
 	private Factura factura;
@@ -95,6 +97,13 @@ public class Reserva {
 
 	public void setIncidencias(Set<Incidencia> incidencias) {
 		this.incidencias = incidencias;
+	}
+	public boolean isValorado() {
+		return valorado;
+	}
+
+	public void setValorado(boolean valorado) {
+		this.valorado = valorado;
 	}
 
 	@Override

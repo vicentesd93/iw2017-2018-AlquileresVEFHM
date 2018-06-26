@@ -238,6 +238,14 @@ public class AnunciosMostrarVista extends VerticalLayout implements View {
 				VerticalLayout der = new VerticalLayout();
 				Label dir = new Label(apartamento.getPoblacion());
 				der.addComponent(dir);
+				if(apartamento.getN_valoraciones() != 0) {
+					Label valoracion = new Label("Valoracion : "+(float)apartamento.getValoracion()/apartamento.getN_valoraciones()+"/5");
+					der.addComponent(valoracion);
+				}else{
+					Label valoracion = new Label("Valoracion : 0/5");
+					der.addComponent(valoracion);
+				}
+				
 
 				dir = new Label(apartamento.getPais());
 				der.addComponent(dir);

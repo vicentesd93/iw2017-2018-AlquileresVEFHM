@@ -66,6 +66,12 @@ public class Apartamento {
 	private boolean trastero;
 	@Column
 	private boolean ascensor;
+	@Column
+	@NotNull
+	private Integer valoracion;
+	@Column
+	@NotNull
+	private Integer n_valoraciones;
 	@OneToMany(mappedBy = "apartamento", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<Foto_apartamento> fotos_apartamento;
 	@OneToMany(mappedBy = "apartamento", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -226,7 +232,22 @@ public class Apartamento {
 	public String getDireccionCompleta() {
 		return direccion + ", " + poblacion + ", " + pais;
 	}
-	
+	public Integer getValoracion() {
+		return valoracion;
+	}
+
+	public void setValoracion(Integer valoracion) {
+		this.valoracion = valoracion;
+	}
+
+	public Integer getN_valoraciones() {
+		return n_valoraciones;
+	}
+
+	public void setN_valoraciones(Integer n_valoraciones) {
+		this.n_valoraciones = n_valoraciones;
+	}
+
 	@Override
 	public String toString() {
 		return "Apartamento [id=" + id + ", descripcion=" + descripcion + ", direccion="
