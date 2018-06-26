@@ -42,6 +42,7 @@ public class AlquileresVefhmApplication {
 	    	if(!rolDao.findAll().iterator().hasNext()) {
 	    		rolDao.save(new Rol("Huesped"));
 	    		rolDao.save(new Rol("Anfitrion"));
+	    		rolDao.save(new Rol("admin"));
 	    	}
 	    	if(!t_aparDao.findAll().iterator().hasNext()) {
 	    		t_aparDao.save(new Tipo_apartamento("Casa"));

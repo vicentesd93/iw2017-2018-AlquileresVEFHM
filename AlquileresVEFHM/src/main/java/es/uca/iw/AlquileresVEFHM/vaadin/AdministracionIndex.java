@@ -21,6 +21,7 @@ import com.vaadin.server.Page;
 import com.vaadin.server.Page.Styles;
 import com.vaadin.server.StreamVariable;
 import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -31,6 +32,7 @@ import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.SelectionMode;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Html5File;
 import com.vaadin.ui.ItemCaptionGenerator;
@@ -43,16 +45,20 @@ import com.vaadin.ui.RadioButtonGroup;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.components.grid.EditorSaveEvent;
 import com.vaadin.ui.components.grid.EditorSaveListener;
 import com.vaadin.ui.dnd.FileDropTarget;
 import com.vaadin.ui.themes.ValoTheme;
 import es.uca.iw.AlquileresVEFHM.DAO.ApartamentoDAO;
+import es.uca.iw.AlquileresVEFHM.DAO.IncidenciaDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.RolDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.Tipo_apartamentoDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.Apartamento;
 import es.uca.iw.AlquileresVEFHM.modelos.Foto_apartamento;
+import es.uca.iw.AlquileresVEFHM.modelos.Incidencia;
+import es.uca.iw.AlquileresVEFHM.modelos.ReservaOferta;
 import es.uca.iw.AlquileresVEFHM.modelos.Tipo_apartamento;
 import es.uca.iw.AlquileresVEFHM.modelos.User;
 import es.uca.iw.AlquileresVEFHM.seguridad.SeguridadUtil;
@@ -74,39 +80,210 @@ public class AdministracionIndex extends VerticalLayout implements View {
 	private Tipo_apartamentoDAO taDao;
 	private ApartamentoDAO aparDao;
 	private UserService us;
+	private final IncidenciaDAO incidenciaDao;
 	
 	@Autowired
-	public AdministracionIndex (UserDAO ud, RolDAO rd, UserService us,Tipo_apartamentoDAO ta,ApartamentoDAO ap) {
+	public AdministracionIndex (IncidenciaDAO id, UserDAO ud, RolDAO rd, UserService us,Tipo_apartamentoDAO ta,ApartamentoDAO ap) {
 		userDao = ud;
 		rolDao = rd;
 		taDao = ta;
 		aparDao = ap;
 		this.us = us;
+		incidenciaDao = id;
 	}
 	private Component radioGestionar() {
 		HorizontalLayout hl = new HorizontalLayout();
 		
-		Label titulo = new Label("Administracion General");
-		titulo.addStyleName(ValoTheme.LABEL_HUGE);
-		vl.addComponent(titulo);
-		
 		gestionar = new RadioButtonGroup<>("Gestionar: ");
 		gestionar.setItems("Usuarios",/* "Rol de Usuario",*/ "Apartamentos"/*, "Tipos de Apartamento"
-						,"Fotos de Apartamento", "Ofertas", "Reservas", "Facturas","Metodos de pago"*/);
+						,"Fotos de Apartamento", "Ofertas", "Reservas", "Facturas","Metodos de pago"*/, "Incidencias");
 		
-		gestionar.addValueChangeListener( event -> hl.addComponent(Crud()));
+		gestionar.addValueChangeListener( event -> {
+			if(crud != null) {
+				hl.removeComponent(crud);
+				crud = null;
+			}
+			Crud();
+			hl.addComponent(crud);
+		});
 		
 		hl.addComponent(gestionar);
 		return hl;
 	}
 	private Component Crud() {
-		if (crud == null) {
-			crud = new RadioButtonGroup<>("Accion: ");
-			crud.setItems("Crear", "Mostrar/Modificar/Eliminar");
-			crud.addValueChangeListener( event -> accionMostrar());
-			return crud;	
-		}else {
+		if(gestionar.getSelectedItem().get().equals("Incidencias")) {
+			vlDinamico.removeAllComponents();
+			vlDinamico.addComponent(new Label("Incidencias"));
+			
+			Grid<Incidencia> recibidas = new Grid<>();
+			recibidas.addComponentColumn(incidencia -> {
+				Button estado = new Button();
+				if(incidencia.isAbierta()) {
+					estado.setCaption("Abierta");
+					estado.setStyleName(ValoTheme.BUTTON_DANGER);
+				}else {
+					estado.setCaption("Cerrada");
+					estado.setStyleName(ValoTheme.BUTTON_FRIENDLY);
+				}
+				estado.setEnabled(false);
+				estado.setSizeFull();
+				return estado;
+			}).setCaption("Estado");
+			recibidas.addColumn(Incidencia::getId).setCaption("Id");
+			recibidas.addColumn(Incidencia::getFecha).setCaption("Fecha");
+			recibidas.addColumn(Incidencia::getEmisor).setCaption("Emisor");
+			recibidas.addColumn(Incidencia::getReceptor).setCaption("Receptor");
+			recibidas.setItems(incidenciaDao.findAll());
+			recibidas.setSelectionMode(SelectionMode.SINGLE);
+			recibidas.setWidth("100%");
+			vlDinamico.addComponent(recibidas);
+			
+			HorizontalLayout hl = new HorizontalLayout();
+			Button datosrecibidos = new Button();
+			datosrecibidos.setCaption("Datos");
+			datosrecibidos.setEnabled(false);
+			hl.addComponent(datosrecibidos);
+			Button resolverrecibidos = new Button();
+			resolverrecibidos.setCaption("Resolver Incidencia");
+			resolverrecibidos.setEnabled(false);
+			hl.addComponent(resolverrecibidos);
+			vlDinamico.addComponent(hl);
+			
+			recibidas.addSelectionListener(new SelectionListener<Incidencia>() {
+				@Override
+				public void selectionChange(SelectionEvent<Incidencia> event) {
+					if(recibidas.asSingleSelect().getValue() == null) {
+						datosrecibidos.setEnabled(false);
+						resolverrecibidos.setEnabled(false);
+					}else {
+						datosrecibidos.setEnabled(true);
+						if(recibidas.asSingleSelect().getValue().isAbierta()) resolverrecibidos.setEnabled(true);
+						else resolverrecibidos.setEnabled(false);
+					}
+				}
+			});
+			
+			datosrecibidos.addClickListener(new ClickListener() {
+				@Override
+				public void buttonClick(ClickEvent event) {
+					Window ventana = new Window("Datos");
+					ventana.setClosable(true);
+					ventana.setResizable(false);
+					ventana.setModal(true);
+					ventana.setWidth("80%");
+					
+					VerticalLayout vl = new VerticalLayout();
+					vl.addComponent(new Label("Emisor: " + recibidas.asSingleSelect().getValue().getEmisor()));
+					vl.addComponent(new Label("Receptor: " + recibidas.asSingleSelect().getValue().getReceptor()));
+					Label apal = new Label("Apartamento");
+					apal.setStyleName(ValoTheme.LABEL_H3);
+					vl.addComponent(apal);
+					vl.addComponent(new Label("Dirección: " + recibidas.asSingleSelect().getValue().getReserva().getReservasofertas().iterator().next().getOferta().getApartamento().getDireccion()));
+					vl.addComponent(new Label("Población: " + recibidas.asSingleSelect().getValue().getReserva().getReservasofertas().iterator().next().getOferta().getApartamento().getPoblacion()));
+					vl.addComponent(new Label("País: " + recibidas.asSingleSelect().getValue().getReserva().getReservasofertas().iterator().next().getOferta().getApartamento().getPais()));
+					vl.addComponent(new Label("Descripción: " + recibidas.asSingleSelect().getValue().getReserva().getReservasofertas().iterator().next().getOferta().getApartamento().getDescripcion()));
+					Label fecl = new Label("Fechas reserva");
+					fecl.setStyleName(ValoTheme.LABEL_H3);
+					vl.addComponent(fecl);
+					for(ReservaOferta ro : recibidas.asSingleSelect().getValue().getReserva().getReservasofertas()) {
+						vl.addComponent(new Label(ro.getOferta().getFecha().toString()));
+					}
+					Label incl = new Label("Datos Incidencia");
+					incl.setStyleName(ValoTheme.LABEL_H3);
+					vl.addComponent(incl);
+					vl.addComponent(new Label("Fecha: " + recibidas.asSingleSelect().getValue().getFecha().toString()));
+					Label actl = new Label();
+					if(recibidas.asSingleSelect().getValue().isAbierta()) {
+						actl.setValue("Abierta");
+						actl.addStyleName(ValoTheme.LABEL_FAILURE);
+					}else {
+						actl.setValue("Cerrada");
+						actl.addStyleName(ValoTheme.LABEL_SUCCESS);
+					}
+					vl.addComponent(actl);
+					TextArea des = new TextArea();
+					des.setCaption("Descripción");
+					des.setValue(recibidas.asSingleSelect().getValue().getDescripcion());
+					des.setEnabled(false);
+					vl.addComponent(des);
+					if(!recibidas.asSingleSelect().getValue().isAbierta()) {
+						TextArea res = new TextArea();
+						res.setCaption("Resolución");
+						if(recibidas.asSingleSelect().getValue().getResolucion() == null) res.setValue("");
+						else res.setValue(recibidas.asSingleSelect().getValue().getResolucion());
+						res.setEnabled(false);
+						vl.addComponent(res);
+					}
+					Button cerrar = new Button("Cerrar");
+					cerrar.addClickListener(new ClickListener() {
+						@Override
+						public void buttonClick(ClickEvent event) {
+							ventana.close();
+						}
+					});
+					vl.addComponent(cerrar);
+					vl.setComponentAlignment(cerrar, Alignment.MIDDLE_CENTER);
+					ventana.setContent(vl);
+					getUI().addWindow(ventana);
+				}
+			});
+			
+			resolverrecibidos.addClickListener(new ClickListener() {
+				@Override
+				public void buttonClick(ClickEvent event) {
+					Window ventana = new Window("Resolver Incidencia");
+					ventana.setClosable(true);
+					ventana.setResizable(false);
+					ventana.setModal(true);
+					ventana.setWidth("80%");
+					
+					VerticalLayout vl = new VerticalLayout();
+					vl.addComponent(new Label("Resolver Incidencia"));
+					TextArea sol = new TextArea();
+					sol.setWidth("100%");
+					vl.addComponent(sol);
+					
+					HorizontalLayout hl = new HorizontalLayout();
+					Button aceptar = new Button("Aceptar");
+					aceptar.addClickListener(new ClickListener() {
+						@Override
+						public void buttonClick(ClickEvent event) {
+							Incidencia in = recibidas.asSingleSelect().getValue();
+							in.setAbierta(false);
+							if(sol.getValue() == null) in.setResolucion("");
+							else in.setResolucion(sol.getValue());
+							incidenciaDao.save(in);
+							Notification.show("Incidencia resuelta", Type.WARNING_MESSAGE);
+							recibidas.setItems(incidenciaDao.findAll());
+							recibidas.getDataProvider().refreshAll();
+							ventana.close();
+						}
+					});
+					hl.addComponent(aceptar);
+					Button cerrar = new Button("Cerrar");
+					cerrar.addClickListener(new ClickListener() {
+						@Override
+						public void buttonClick(ClickEvent event) {
+							ventana.close();
+						}
+					});
+					hl.addComponent(cerrar);
+					vl.addComponent(hl);
+					ventana.setContent(vl);
+					getUI().addWindow(ventana);
+				}
+			});
+			crud = new RadioButtonGroup<String>();
 			return new RadioButtonGroup<String>();
+		}else {
+			if (crud == null) {
+				crud = new RadioButtonGroup<>("Accion: ");
+				crud.setItems("Crear", "Mostrar/Modificar/Eliminar");
+				crud.addValueChangeListener( event -> accionMostrar());
+				return crud;	
+			}else {
+				return new RadioButtonGroup<String>();
+			}
 		}
 	}
 	private void accionMostrar() {
@@ -712,6 +889,10 @@ public class AdministracionIndex extends VerticalLayout implements View {
 		}
 		setWidth("100%");
 		vl.setSizeFull();
+		Label titulo = new Label("Administracion General");
+		titulo.addStyleName(ValoTheme.LABEL_HUGE);
+		vl.addComponent(titulo);
+		
 		vlEstatico.addComponent(radioGestionar());
 		vl.addComponent(vlEstatico);
 		vl.addComponent(vlDinamico);

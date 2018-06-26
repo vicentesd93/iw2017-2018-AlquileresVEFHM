@@ -36,6 +36,8 @@ public class Reserva {
 	private Factura factura;
 	@OneToMany(mappedBy = "reserva", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<ReservaOferta> reservasofertas;
+	@OneToMany(mappedBy="reserva", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private Set<Incidencia> incidencias;
 	
 	public Reserva() {}
 
@@ -87,6 +89,14 @@ public class Reserva {
 		this.reservasofertas = reservasofertas;
 	}
 	
+	public Set<Incidencia> getIncidencias() {
+		return incidencias;
+	}
+
+	public void setIncidencias(Set<Incidencia> incidencias) {
+		this.incidencias = incidencias;
+	}
+
 	@Override
 	public boolean equals(Object object) {
 		if(object == null || object.getClass() != getClass()) return false;
@@ -104,5 +114,14 @@ public class Reserva {
 			total += ro.getOferta().getPrecio();
 		}
 		return total;
+	}
+
+	@Override
+	public String toString() {
+		return "Apartamento: " + reservasofertas.iterator().next().getOferta().getApartamento().getDireccionCompleta();
+	}
+	
+	public User getAnfitrion() {
+		return reservasofertas.iterator().next().getOferta().getApartamento().getAnfitrion();
 	}
 }

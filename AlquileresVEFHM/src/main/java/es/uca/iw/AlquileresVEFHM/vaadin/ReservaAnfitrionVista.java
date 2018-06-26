@@ -278,7 +278,6 @@ public class ReservaAnfitrionVista extends VerticalLayout implements View {
 				VerticalLayout vl = new VerticalLayout();
 				
 				Set<Oferta> ofers = new HashSet<Oferta>();
-				
 				for(ReservaOferta ro : reserva.getReservasofertas()) {
 					ofers.add(ro.getOferta());
 				}

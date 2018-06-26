@@ -90,6 +90,10 @@ public class User implements UserDetails{
 	private Set<Apartamento> apartamentos;
 	@OneToMany(mappedBy = "huesped", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<Reserva> reservas;
+	@OneToMany(mappedBy="emisor", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
+	private Set<Incidencia> incidenciasemisor;
+	@OneToMany(mappedBy="receptor", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
+	private Set<Incidencia> incidenciasreceptor;
 	
 	public User() {}
 	public User(@NotEmpty(message = "*Introduza su nombre de usuario") @NotNull String login,
@@ -166,6 +170,12 @@ public class User implements UserDetails{
 	public Set<Reserva> getReservas() {
 		return reservas;
 	}
+	public Set<Incidencia> getIncidenciasemisor() {
+		return incidenciasemisor;
+	}
+	public Set<Incidencia> getIncidenciasreceptor() {
+		return incidenciasreceptor;
+	}
 	
 	public void setId(Integer id) {
 		this.id = id;
@@ -215,6 +225,12 @@ public class User implements UserDetails{
 	public void setReservas(Set<Reserva> reservas) {
 		this.reservas = reservas;
 	}
+	public void setIncidenciasemisor(Set<Incidencia> incidenciasemisor) {
+		this.incidenciasemisor = incidenciasemisor;
+	}
+	public void setIncidenciasreceptor(Set<Incidencia> incidenciasreceptor) {
+		this.incidenciasreceptor = incidenciasreceptor;
+	}
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -249,10 +265,7 @@ public class User implements UserDetails{
 	
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", login=" + login + ", clave=" + clave + ", email=" + email + ", dni=" + dni
-				+ ", nombre=" + nombre + ", apellidos=" + apellidos + ", f_nacimiento=" + f_nacimiento + ", sexo="
-				+ sexo + ", direccion=" + direccion + ", telefono=" + telefono + ", rol=" + rol + ", f_creacion="
-				+ f_creacion + ", activo=" + activo + ", apartamentos=" + apartamentos + ", reservas=" + reservas + "]";
+		return nombre + " " + apellidos;
 	}
 	public LocalDate getLDF_nacimiento() {
 		if(f_nacimiento == null) return null;
