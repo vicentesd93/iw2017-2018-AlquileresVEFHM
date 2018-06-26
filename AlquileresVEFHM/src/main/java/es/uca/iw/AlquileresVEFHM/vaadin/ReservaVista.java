@@ -108,7 +108,15 @@ public class ReservaVista extends VerticalLayout implements View {
 		grid.setItems(ofertasseleccionadas);
 		grid.setSelectionMode(SelectionMode.NONE);
 		grid.addColumn(Oferta::getLDFecha).setCaption("Fecha");
-		grid.addColumn(Oferta::getPrecio).setCaption("Precio");
+		grid.addColumn(oferta -> {
+			return String.format("%.2f €", oferta.getPrecio());
+		}).setCaption("Precio");
+		grid.addColumn(oferta -> {
+			return String.format("%.2f €", oferta.getPrecio()*0.21);
+		}).setCaption("IVA");
+		grid.addColumn(oferta -> {
+			return String.format("%.2f €", oferta.getPrecio()*1.21);
+		}).setCaption("Total");
 		grid.addColumn(Oferta::getPenalizacion).setCaption("Penalizacion %");
 		addComponent(grid);
 		
@@ -231,7 +239,7 @@ public class ReservaVista extends VerticalLayout implements View {
 					if(LocalDate.now().compareTo(i) > 0) p.setEnabled(false);
 					Oferta ofer = oferta;
 					p.addStyleName(ValoTheme.BUTTON_PRIMARY);
-					String caption = "Disponible " + ofer.getPrecio() + "€";
+					String caption = "Disponible " + ofer.getPrecio()*1.21 + "€";
 					p.addClickListener(new ClickListener() {
 						@Override
 						public void buttonClick(ClickEvent event) {
@@ -242,7 +250,7 @@ public class ReservaVista extends VerticalLayout implements View {
 								ofertasseleccionadas.add(ofer);
 								grid.getDataProvider().refreshAll();
 								importetotal += ofer.getPrecio();
-								total.setValue("Total: " + Float.toString(importetotal) + "€");
+								total.setValue("Total: " + Float.toString((float)(importetotal*1.21)) + "€");
 							}else {
 								p.removeStyleName(ValoTheme.BUTTON_FRIENDLY);
 								p.addStyleName(ValoTheme.BUTTON_PRIMARY);
@@ -250,7 +258,7 @@ public class ReservaVista extends VerticalLayout implements View {
 								ofertasseleccionadas.remove(ofer);
 								grid.getDataProvider().refreshAll();
 								importetotal -= ofer.getPrecio();
-								total.setValue("Total: " + Float.toString(importetotal) + "€");
+								total.setValue("Total: " + Float.toString((float)(importetotal*1.21)) + "€");
 							}
 						}
 					});

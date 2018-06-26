@@ -7,10 +7,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
 import javax.annotation.PostConstruct;
 import javax.sql.rowset.serial.SerialBlob;
 import javax.sql.rowset.serial.SerialException;
+
 import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.data.Binder;
 import com.vaadin.data.ValidationException;
 import com.vaadin.data.validator.EmailValidator;
@@ -32,13 +35,13 @@ import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.SelectionMode;
-import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Html5File;
 import com.vaadin.ui.ItemCaptionGenerator;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.RadioButtonGroup;
@@ -50,12 +53,15 @@ import com.vaadin.ui.components.grid.EditorSaveEvent;
 import com.vaadin.ui.components.grid.EditorSaveListener;
 import com.vaadin.ui.dnd.FileDropTarget;
 import com.vaadin.ui.themes.ValoTheme;
+
 import es.uca.iw.AlquileresVEFHM.DAO.ApartamentoDAO;
+import es.uca.iw.AlquileresVEFHM.DAO.FacturaDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.IncidenciaDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.RolDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.Tipo_apartamentoDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.Apartamento;
+import es.uca.iw.AlquileresVEFHM.modelos.Factura;
 import es.uca.iw.AlquileresVEFHM.modelos.Foto_apartamento;
 import es.uca.iw.AlquileresVEFHM.modelos.Incidencia;
 import es.uca.iw.AlquileresVEFHM.modelos.ReservaOferta;
@@ -64,6 +70,7 @@ import es.uca.iw.AlquileresVEFHM.modelos.User;
 import es.uca.iw.AlquileresVEFHM.seguridad.SeguridadUtil;
 import es.uca.iw.AlquileresVEFHM.seguridad.UserService;
 
+@SuppressWarnings({"serial", "deprecation"})
 @SpringView(name = AdministracionIndex.NOMBRE)
 public class AdministracionIndex extends VerticalLayout implements View {
 	private static final long serialVersionUID = 1L;
@@ -81,22 +88,24 @@ public class AdministracionIndex extends VerticalLayout implements View {
 	private ApartamentoDAO aparDao;
 	private UserService us;
 	private final IncidenciaDAO incidenciaDao;
+	private final FacturaDAO facturaDao;
 	
 	@Autowired
-	public AdministracionIndex (IncidenciaDAO id, UserDAO ud, RolDAO rd, UserService us,Tipo_apartamentoDAO ta,ApartamentoDAO ap) {
+	public AdministracionIndex (IncidenciaDAO id, FacturaDAO fd, UserDAO ud, RolDAO rd, UserService us,Tipo_apartamentoDAO ta,ApartamentoDAO ap) {
 		userDao = ud;
 		rolDao = rd;
 		taDao = ta;
 		aparDao = ap;
 		this.us = us;
 		incidenciaDao = id;
+		facturaDao = fd;
 	}
 	private Component radioGestionar() {
 		HorizontalLayout hl = new HorizontalLayout();
 		
 		gestionar = new RadioButtonGroup<>("Gestionar: ");
 		gestionar.setItems("Usuarios",/* "Rol de Usuario",*/ "Apartamentos"/*, "Tipos de Apartamento"
-						,"Fotos de Apartamento", "Ofertas", "Reservas", "Facturas","Metodos de pago"*/, "Incidencias");
+						,"Fotos de Apartamento", "Ofertas", "Reservas", "Facturas","Metodos de pago"*/, "Incidencias" , "Facturación");
 		
 		gestionar.addValueChangeListener( event -> {
 			if(crud != null) {
@@ -110,6 +119,7 @@ public class AdministracionIndex extends VerticalLayout implements View {
 		hl.addComponent(gestionar);
 		return hl;
 	}
+	
 	private Component Crud() {
 		if(gestionar.getSelectedItem().get().equals("Incidencias")) {
 			vlDinamico.removeAllComponents();
@@ -273,6 +283,86 @@ public class AdministracionIndex extends VerticalLayout implements View {
 					getUI().addWindow(ventana);
 				}
 			});
+			crud = new RadioButtonGroup<String>();
+			return new RadioButtonGroup<String>();
+		}else if(gestionar.getSelectedItem().get().equals("Facturación")){
+			vlDinamico.removeAllComponents();
+			vlDinamico.addComponent(new Label("Facturación"));
+			Grid<Factura> facturacion = new Grid<>();
+			facturacion.addColumn(Factura::getId).setCaption("Id");
+			facturacion.addComponentColumn(factura -> {
+				Button reserva = new Button("Ver reserva");
+				reserva.addStyleName(ValoTheme.BUTTON_BORDERLESS);
+				reserva.addClickListener(click -> {
+					Window ventana = new Window("Reserva");
+					ventana.setClosable(true);
+					ventana.setResizable(false);
+					ventana.setModal(true);
+					ventana.setWidth("80%");
+					VerticalLayout vlv = new VerticalLayout();
+					vlv.addComponent(new Label("Huesped: " + factura.getReserva().getHuesped()));
+					vlv.addComponent(new Label("Fechas:"));
+					for(ReservaOferta ro : factura.getReserva().getReservasofertas()) {
+						vlv.addComponent(new Label(ro.getOferta().getFecha().toString()));
+					}
+					vlv.addComponent(new Label("APARTAMENTO"));
+					vlv.addComponent(new Label("Dirección: " + factura.getReserva().getReservasofertas().iterator().next().getOferta().getApartamento().getDireccion()));
+					vlv.addComponent(new Label("Población: " + factura.getReserva().getReservasofertas().iterator().next().getOferta().getApartamento().getPoblacion()));
+					vlv.addComponent(new Label("País: " + factura.getReserva().getReservasofertas().iterator().next().getOferta().getApartamento().getPais()));
+					vlv.addComponent(new Label("Descripción: " + factura.getReserva().getReservasofertas().iterator().next().getOferta().getApartamento().getDescripcion()));
+					Button cerrar = new Button("Cerrar", event -> { 
+						ventana.close();
+					});
+					vlv.addComponent(cerrar);
+					ventana.setContent(vlv);
+					getUI().addWindow(ventana);
+				});
+				return reserva;
+			}).setCaption("Reserva");
+			facturacion.addColumn(factura -> {
+				return factura.getMetodo_pago().getDescripcion();
+			}).setCaption("Método de pago");
+			facturacion.addColumn(factura -> {
+				return factura.getMetodo_pago().getCargo_adicional();
+			}).setCaption("Recargo %");
+			facturacion.addColumn(factura -> {
+				return String.format("%.2f €", factura.getTotal() - factura.getIva() - factura.getComision());
+			}).setCaption("Precio");
+			facturacion.addColumn(factura -> {
+				return String.format("%.2f €", factura.getIva());
+			}).setCaption("IVA");
+			facturacion.addColumn(factura -> {
+				return String.format("%.2f €", factura.getComision());
+			}).setCaption("Recargo");
+			facturacion.addColumn(factura -> {
+				return String.format("%.2f €", factura.getTotal());
+			}).setCaption("Total");
+			facturacion.addColumn(factura -> {
+				return String.format("%.2f €", (factura.getTotal() - factura.getIva() - factura.getComision()) * 0.05);
+			}).setCaption("Ganancia");
+			facturacion.setSelectionMode(SelectionMode.NONE);
+			facturacion.setItems(facturaDao.findAll());
+			facturacion.setWidth("100%");
+			vlDinamico.addComponent(facturacion);
+			float iva = 0;
+			float recargo = 0;
+			float totbruto = 0;
+			float comision = 0;
+			float total = 0;
+			for(Factura fac : facturaDao.findAll()) {
+				iva += fac.getIva();
+				recargo += fac.getComision();
+				totbruto += (float)(fac.getTotal() - fac.getIva() - fac.getComision());
+				comision += (float)((fac.getTotal() - fac.getIva() - fac.getComision()) * 0.05);
+				total += fac.getTotal();
+			}
+			vlDinamico.addComponent(new Label("IVA total: " + String.format("%.2f", iva) + " € "
+					+ "Recargo total: " + String.format("%.2f", recargo) + " € "
+					+ "Total bruto: " + String.format("%.2f", totbruto) + " € "
+					+ "Total neto: " + String.format("%.2f", total) + " €"));
+			Label ganan = new Label("Ganancia total: " + String.format("%.2f", comision) + " € ");
+			ganan.addStyleName(ValoTheme.LABEL_H4);
+			vlDinamico.addComponent(ganan);
 			crud = new RadioButtonGroup<String>();
 			return new RadioButtonGroup<String>();
 		}else {
@@ -889,7 +979,7 @@ public class AdministracionIndex extends VerticalLayout implements View {
 		}
 		setWidth("100%");
 		vl.setSizeFull();
-		Label titulo = new Label("Administracion General");
+		Label titulo = new Label("Administración General");
 		titulo.addStyleName(ValoTheme.LABEL_HUGE);
 		vl.addComponent(titulo);
 		

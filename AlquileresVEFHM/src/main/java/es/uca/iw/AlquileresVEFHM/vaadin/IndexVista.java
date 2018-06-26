@@ -81,6 +81,7 @@ public class IndexVista extends VerticalLayout implements ViewDisplay {
 				barraNavegacion.addComponent(apartamentosMenu);
 				barraNavegacion.addComponent(crearBotonNavegacion("Reservas",ReservaAnfitrionVista.NOMBRE));
 				barraNavegacion.addComponent(crearBotonNavegacion("Incidencias",IncidenciasVista.NOMBRE));
+				barraNavegacion.addComponent(crearBotonNavegacion("Facturación",FacturacionAnfitrionVista.NOMBRE));				
 			}else if(SeguridadUtil.getRol().equals("Huesped")) {
 				barraNavegacion.addComponent(crearBotonNavegacion("Reservas",ReservaHuespedVista.NOMBRE));
 				barraNavegacion.addComponent(crearBotonNavegacion("Incidencias",IncidenciasVista.NOMBRE));

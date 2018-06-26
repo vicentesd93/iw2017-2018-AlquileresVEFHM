@@ -1,10 +1,12 @@
 package es.uca.iw.AlquileresVEFHM.vaadin;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.navigator.View;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringView;
@@ -21,6 +23,7 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
 import es.uca.iw.AlquileresVEFHM.DAO.ApartamentoDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.OfertaDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.Apartamento;
@@ -45,17 +48,18 @@ public class AnunciosMostrarVista extends VerticalLayout implements View {
 	
 	@PostConstruct
 	void init() {
-		List<Apartamento> apartamentosParaMostrar = new ArrayList<Apartamento>();
+		//List<Apartamento> apartamentosParaMostrar = new ArrayList<Apartamento>();
 
 		//Huesped busque apartamentos -> TRAERNOS TODOS LOS APARTAMENTOS DE LA BD [PENDIENTE FILTRAR]
 		//Huesped posibilidad de que pueda reservar un apartamento
 		
-		for (Iterator<Oferta> it = ofertaDao.findAll().iterator(); it.hasNext();) {
+		/*for (Iterator<Oferta> it = ofertaDao.findAll().iterator(); it.hasNext();) {
 			Oferta a = it.next();
 			if (!apartamentosParaMostrar.contains(a.getApartamento())) {
 				apartamentosParaMostrar.add(a.getApartamento());
 			}
-		}
+		}*/
+		List<Apartamento> apartamentosParaMostrar = aparDao.apartamentosOfertados();
 
 		VerticalLayout vlFiltro = new VerticalLayout();
 		VerticalLayout vlMostrarApartamentos = new VerticalLayout();

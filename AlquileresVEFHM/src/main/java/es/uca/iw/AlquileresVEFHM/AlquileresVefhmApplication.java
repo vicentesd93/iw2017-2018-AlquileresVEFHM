@@ -57,7 +57,7 @@ public class AlquileresVefhmApplication {
 	    		m_pagoDao.save(new Metodo_pago("PayPal", 10));
 	    	}
 	    	if(userDao.findByLogin("admin") == null) {
-	    		User u = new User("admin", "admin", "admin@mail.com", "1234", "admin", "admin", new Date(), true, "Direccion", "8237232",rolDao.findAll().iterator().next(), null, false);
+	    		User u = new User("admin", "admin", "admin@mail.com", "1234", "admin", "admin", new Date(), true, "Direccion", "8237232",rolDao.findByNombre("admin"), null, false);
 	    		userService.save(u);
 	    	}
 	    };

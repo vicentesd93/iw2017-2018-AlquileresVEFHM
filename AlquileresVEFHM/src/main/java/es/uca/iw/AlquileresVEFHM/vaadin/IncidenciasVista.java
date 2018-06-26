@@ -1,9 +1,7 @@
 package es.uca.iw.AlquileresVEFHM.vaadin;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -37,10 +35,10 @@ import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.Incidencia;
 import es.uca.iw.AlquileresVEFHM.modelos.Reserva;
 import es.uca.iw.AlquileresVEFHM.modelos.ReservaOferta;
-import es.uca.iw.AlquileresVEFHM.modelos.Tipo_apartamento;
 import es.uca.iw.AlquileresVEFHM.modelos.User;
 import es.uca.iw.AlquileresVEFHM.seguridad.SeguridadUtil;
 
+@SuppressWarnings({"serial", "deprecation"})
 @SpringView(name = IncidenciasVista.NOMBRE)
 public class IncidenciasVista extends VerticalLayout implements View {
 	public static final String NOMBRE = "Incidencias";

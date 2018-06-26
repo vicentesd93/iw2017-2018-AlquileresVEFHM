@@ -2,10 +2,13 @@ package es.uca.iw.AlquileresVEFHM.vaadin;
 
 import java.time.ZoneId;
 import java.util.Date;
+
 import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 import com.vaadin.data.Binder;
 import com.vaadin.data.ValidationException;
 import com.vaadin.data.validator.EmailValidator;
@@ -28,10 +31,12 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
 import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.User;
 import es.uca.iw.AlquileresVEFHM.seguridad.SeguridadUtil;
 
+@SuppressWarnings("deprecation")
 @SpringView(name = CuentaUsuarioVista.NOMBRE)
 public class CuentaUsuarioVista extends HorizontalLayout implements View {
 	private static final long serialVersionUID = 1L;
