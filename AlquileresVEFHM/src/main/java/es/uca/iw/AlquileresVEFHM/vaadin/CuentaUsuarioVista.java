@@ -30,6 +30,7 @@ import com.vaadin.ui.RadioButtonGroup;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
@@ -328,19 +329,38 @@ public class CuentaUsuarioVista extends HorizontalLayout implements View {
 	private Component borrarCuenta() {
 		VerticalLayout vl = new VerticalLayout();
 		vl.setSizeFull();
-		
-		Binder<User> binder = new Binder<>();
-        
+		        
         Button Eliminar = new Button("Eliminar", event -> {
-      		User u = userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado());
-      		//System.out.println("------------------->"+userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado()).getNombre());
-      		//userDao.delete(u);
-      		userDao.deleteById(userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado()).getId());
-			Notification.show("Usuario Eliminado");
-			
-			//cerramos sesion
-			getUI().getPage().reload();
-			getSession().close();
+      		Window ventana = new Window();
+      		ventana.setClosable(true);
+			ventana.setResizable(false);
+			ventana.setModal(true);
+			ventana.setWidth(300f, Unit.PIXELS);
+      		VerticalLayout vlv = new VerticalLayout();
+      		vlv.addComponent(new Label("¿Desea borrar su usuario?"));
+      		HorizontalLayout hl = new HorizontalLayout();
+      		Button si = new Button("Si", click -> {
+      			User u = userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado());
+          		//System.out.println("------------------->"+userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado()).getNombre());
+          		//userDao.delete(u);
+          		userDao.deleteById(userDao.findByLogin(SeguridadUtil.getLoginUsuarioLogeado()).getId());
+    			Notification.show("Usuario Eliminado");
+    			
+    			//cerramos sesion
+    			getUI().getPage().reload();
+    			getSession().close();
+      		});
+      		si.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+      		hl.addComponent(si);
+      		Button no = new Button("No", click -> {
+      			ventana.close();
+      		});
+      		no.addStyleName(ValoTheme.BUTTON_DANGER);
+      		hl.addComponent(no);
+      		vlv.addComponent(hl);
+      		vlv.setComponentAlignment(hl, Alignment.MIDDLE_CENTER);
+      		ventana.setContent(vlv);
+      		getUI().addWindow(ventana);
       });
       Eliminar.addStyleName(ValoTheme.BUTTON_DANGER);
       vl.addComponent(Eliminar);

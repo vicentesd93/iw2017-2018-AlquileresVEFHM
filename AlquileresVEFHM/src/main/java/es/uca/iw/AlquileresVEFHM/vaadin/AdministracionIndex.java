@@ -732,6 +732,9 @@ public class AdministracionIndex extends VerticalLayout implements View {
 						fa.setApartamento(a);
 						fotos.add(fa);
 					}
+					a.setFotos_apartamento(fotos);
+					a.setValoracion(0);
+					a.setN_valoraciones(0);
 					Notification.show("Apartamento registrado correctamente");
 					a.setFotos_apartamento(fotos);
 					aparDao.save(a);

@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -34,6 +35,7 @@ import es.uca.iw.AlquileresVEFHM.DAO.ReservaDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.ReservaOfertaDAO;
 import es.uca.iw.AlquileresVEFHM.DAO.UserDAO;
 import es.uca.iw.AlquileresVEFHM.modelos.Apartamento;
+import es.uca.iw.AlquileresVEFHM.modelos.Mail;
 import es.uca.iw.AlquileresVEFHM.modelos.Oferta;
 import es.uca.iw.AlquileresVEFHM.modelos.Reserva;
 import es.uca.iw.AlquileresVEFHM.modelos.ReservaOferta;
@@ -63,6 +65,8 @@ public class ReservaVista extends VerticalLayout implements View {
 		resDao = rd;
 		reofDao = rod;
 	}
+    @Autowired
+    private EmailServiceImpl emailService;
 	
 	@PostConstruct
 	void init() {
@@ -165,6 +169,67 @@ public class ReservaVista extends VerticalLayout implements View {
 							ro.setReserva(r);
 							reofDao.save(ro);
 						}
+						//ENVIA EL EMAIL
+				        String contenido = "Peticion de reserva realizada correctamente, a continuación se le mostrará información sobre el apartamento y el anfitrión\n";
+				        String st = apartamento.getDescripcion();
+				        contenido += "Descripción del apartamento: ";
+				        contenido += st;
+				        contenido += "\n";
+				        st = apartamento.getDireccion();
+				        contenido += "Dirección del apartamento: ";
+				        contenido += st;
+				        contenido += "\n";
+				        st = apartamento.getPoblacion();
+				        contenido += "Pob del apartamento: ";
+				        contenido += st;
+				        contenido += "\n";
+				        st = apartamento.getPais();
+				        contenido += "País del anfitrion: ";
+				        contenido += st;
+				        contenido += "\n";
+				        st = apartamento.getAnfitrion().getNombre();
+				        contenido += "Nombre del anfitrion: ";
+				        contenido += st;
+				        contenido += "\n";
+				        st = apartamento.getAnfitrion().getEmail();
+				        contenido += "Email del anfitrion: ";
+				        contenido += st;
+				        contenido += "\n";
+				        st = apartamento.getAnfitrion().getTelefono();
+				        contenido += "Teléfono del anfitrion: ";
+				        contenido += st;
+				        contenido += "\n";
+				        Mail mail = new Mail();
+				        mail.setFrom("botalquileres@gmail.com");
+				        mail.setTo(r.getHuesped().getEmail());
+				        mail.setSubject("Reserva");
+				        mail.setContent(contenido);
+				        emailService.sendSimpleMessage(mail);
+				        
+				        contenido = "Nueva petición de reserva, a continuación se le mostrará información sobre el apartamento en cuestión\n";
+				        st = apartamento.getDescripcion();
+				        contenido += "Descripción del apartamento: ";
+				        contenido += st;
+				        contenido += "\n";
+				        st = apartamento.getDireccion();
+				        contenido += "Dirección del apartamento: ";
+				        contenido += st;
+				        contenido += "\n";
+				        st = apartamento.getPais();
+				        contenido += "País del apartamento: ";
+				        contenido += st;
+				        contenido += "\n";
+				        st = apartamento.getPoblacion();
+				        contenido += "Población del apartamento: ";
+				        contenido += st;
+				        contenido += "\n";
+				        
+				        Mail mailToAnfitrion = new Mail();
+				        mailToAnfitrion.setFrom("botalquileres@gmail.com");
+				        mailToAnfitrion.setTo(apartamento.getAnfitrion().getEmail());
+				        mailToAnfitrion.setSubject("Petición de reserva");
+				        mailToAnfitrion.setContent(contenido);
+				        emailService.sendSimpleMessage(mailToAnfitrion);
 						Notification.show("Reserva creada correctamente. \nSe le avisara cuando el anfitrión acepte la reserva", Notification.TYPE_WARNING_MESSAGE);
 						getUI().getNavigator().navigateTo(AnunciosMostrarVista.NOMBRE);
 					}catch(Exception e) {
@@ -295,4 +360,3 @@ public class ReservaVista extends VerticalLayout implements View {
 		return calendario;
 	}
 }
-

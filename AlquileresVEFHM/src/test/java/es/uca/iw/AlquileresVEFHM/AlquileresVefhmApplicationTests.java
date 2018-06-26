@@ -130,7 +130,7 @@ public class AlquileresVefhmApplicationTests {
 		
 		 tipoApDAO.save(tipoApart);
 		 apartamento.setTipo_apartamento(tipoApDAO.findById(1).get());
-		 apartDao.save(apartamento);
+		// apartDao.save(apartamento);
 		 userdao.save(anfitrion);
 		 assertNotNull(userdao.findById(anfitrion.getId()).get().getApartamentos());
 	 }
