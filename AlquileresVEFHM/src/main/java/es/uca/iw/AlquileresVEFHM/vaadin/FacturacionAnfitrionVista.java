@@ -108,7 +108,7 @@ public class FacturacionAnfitrionVista extends VerticalLayout implements View {
 		float totbruto = 0;
 		float comision = 0;
 		float total = 0;
-		for(Factura fac : facturaDao.findAll()) {
+		for(Factura fac : facturaDao.buscarAnfitrion(user)) {
 			iva += fac.getIva();
 			recargo += fac.getComision();
 			totbruto += (float)(fac.getTotal() - fac.getIva() - fac.getComision());
