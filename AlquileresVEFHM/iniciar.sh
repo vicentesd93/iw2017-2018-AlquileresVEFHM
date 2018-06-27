@@ -18,6 +18,6 @@ then
 	mysql -u$user -p$pass -e "CREATE USER 'inmouser'@'localhost' IDENTIFIED BY '6eEFc5^T3:1WAm51-nl*';" &> /dev/null
 	mysql -u$user -p$pass -e "GRANT ALL PRIVILEGES ON db_inmobiliaria.* TO 'inmouser'@'localhost';" &> /dev/null
 fi
-
+mkdir pdf &> /dev/null
 echo "Iniciando aplicacion"
 java -jar AlquileresVEFHM-0.0.1-SNAPSHOT.jar
